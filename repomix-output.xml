@@ -1,0 +1,1478 @@
+This file is a merged representation of the entire codebase, combined into a single document by Repomix.
+
+<file_summary>
+This section contains a summary of this file.
+
+<purpose>
+This file contains a packed representation of the entire repository's contents.
+It is designed to be easily consumable by AI systems for analysis, code review,
+or other automated processes.
+</purpose>
+
+<file_format>
+The content is organized as follows:
+1. This summary section
+2. Repository information
+3. Directory structure
+4. Repository files (if enabled)
+5. Multiple file entries, each consisting of:
+  - File path as an attribute
+  - Full contents of the file
+</file_format>
+
+<usage_guidelines>
+- This file should be treated as read-only. Any changes should be made to the
+  original repository files, not this packed version.
+- When processing this file, use the file path to distinguish
+  between different files in the repository.
+- Be aware that this file may contain sensitive information. Handle it with
+  the same level of security as you would the original repository.
+</usage_guidelines>
+
+<notes>
+- Some files may have been excluded based on .gitignore rules and Repomix's configuration
+- Binary files are not included in this packed representation. Please refer to the Repository Structure section for a complete list of file paths, including binary files
+- Files matching patterns in .gitignore are excluded
+- Files matching default ignore patterns are excluded
+- Files are sorted by Git change count (files with more changes are at the bottom)
+</notes>
+
+</file_summary>
+
+<directory_structure>
+.claude/
+  settings.json
+assets/
+  expo.icon/
+    Assets/
+      expo-symbol 2.svg
+      grid.png
+    icon.json
+  images/
+    tabIcons/
+      explore.png
+      explore@2x.png
+      explore@3x.png
+      home.png
+      home@2x.png
+      home@3x.png
+    android-icon-background.png
+    android-icon-foreground.png
+    android-icon-monochrome.png
+    expo-badge-white.png
+    expo-badge.png
+    expo-logo.png
+    favicon.png
+    icon.png
+    logo-glow.png
+    react-logo.png
+    react-logo@2x.png
+    react-logo@3x.png
+    splash-icon.png
+    tutorial-web.png
+  fire.json
+  garden.json
+scripts/
+  reset-project.js
+src/
+  app/
+    (tabs)/
+      _layout.tsx
+      deen-hub.tsx
+      index.tsx
+      taqwa.tsx
+    _layout.tsx
+  services/
+    aiService.ts
+    dbService.ts
+    firebase.ts
+  store/
+    store.ts
+    taqwaSlice.ts
+.gitignore
+AGENTS.md
+app.json
+CLAUDE.md
+LICENSE
+package.json
+README.md
+tsconfig.json
+</directory_structure>
+
+<files>
+This section contains the contents of the repository's files.
+
+<file path=".claude/settings.json">
+{
+  "enabledPlugins": {
+    "expo@claude-plugins-official": true
+  }
+}
+</file>
+
+<file path="assets/expo.icon/Assets/expo-symbol 2.svg">
+<svg width="652" height="606" viewBox="0 0 652 606" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M353.554 0H298.446C273.006 0 249.684 14.6347 237.962 37.9539L4.37994 502.646C-1.04325 513.435 -1.45067 526.178 3.2716 537.313L22.6123 582.918C34.6475 611.297 72.5404 614.156 88.4414 587.885L309.863 222.063C313.34 216.317 319.439 212.826 326 212.826C332.561 212.826 338.659 216.317 342.137 222.063L563.559 587.885C579.46 614.156 617.352 611.297 629.388 582.918L648.728 537.313C653.451 526.178 653.043 513.435 647.62 502.646L414.038 37.9539C402.316 14.6347 378.994 0 353.554 0Z" fill="white"/>
+</svg>
+</file>
+
+<file path="assets/expo.icon/icon.json">
+{
+  "fill" : {
+    "automatic-gradient" : "extended-srgb:0.00000,0.47843,1.00000,1.00000"
+  },
+  "groups" : [
+    {
+      "layers" : [
+        {
+          "image-name" : "expo-symbol 2.svg",
+          "name" : "expo-symbol 2",
+          "position" : {
+            "scale" : 1,
+            "translation-in-points" : [
+              1.1008400065293245e-05,
+              -16.046875
+            ]
+          }
+        },
+        {
+          "image-name" : "grid.png",
+          "name" : "grid"
+        }
+      ],
+      "shadow" : {
+        "kind" : "neutral",
+        "opacity" : 0.5
+      },
+      "translucency" : {
+        "enabled" : true,
+        "value" : 0.5
+      }
+    }
+  ],
+  "supported-platforms" : {
+    "circles" : [
+      "watchOS"
+    ],
+    "squares" : "shared"
+  }
+}
+</file>
+
+<file path="assets/fire.json">
+{"v":"5.5.2","fr":29.9700012207031,"ip":0,"op":60,"w":500,"h":500,"nm":"Dummy Animation","ddd":0,"assets":[],"layers":[]}
+</file>
+
+<file path="assets/garden.json">
+{"v":"5.5.2","fr":29.9700012207031,"ip":0,"op":60,"w":500,"h":500,"nm":"Dummy Animation","ddd":0,"assets":[],"layers":[]}
+</file>
+
+<file path="scripts/reset-project.js">
+#!/usr/bin/env node
+
+/**
+ * This script is used to reset the project to a blank state.
+ * It deletes or moves the /src and /scripts directories to /example based on user input and creates a new /src/app directory with an index.tsx and _layout.tsx file.
+ * You can remove the `reset-project` script from package.json and safely delete this file after running it.
+ */
+
+const fs = require("fs");
+const path = require("path");
+const readline = require("readline");
+
+const root = process.cwd();
+const oldDirs = ["src", "scripts"];
+const exampleDir = "example";
+const newAppDir = "src/app";
+const exampleDirPath = path.join(root, exampleDir);
+
+const indexContent = `import { Text, View, StyleSheet } from "react-native";
+
+export default function Index() {
+  return (
+    <View style={styles.container}>
+      <Text>Edit src/app/index.tsx to edit this screen.</Text>
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+});
+`;
+
+const layoutContent = `import { Stack } from "expo-router";
+
+export default function RootLayout() {
+  return <Stack />;
+}
+`;
+
+const rl = readline.createInterface({
+  input: process.stdin,
+  output: process.stdout,
+});
+
+const moveDirectories = async (userInput) => {
+  try {
+    if (userInput === "y") {
+      // Create the app-example directory
+      await fs.promises.mkdir(exampleDirPath, { recursive: true });
+      console.log(`📁 /${exampleDir} directory created.`);
+    }
+
+    // Move old directories to new app-example directory or delete them
+    for (const dir of oldDirs) {
+      const oldDirPath = path.join(root, dir);
+      if (fs.existsSync(oldDirPath)) {
+        if (userInput === "y") {
+          const newDirPath = path.join(root, exampleDir, dir);
+          await fs.promises.rename(oldDirPath, newDirPath);
+          console.log(`➡️ /${dir} moved to /${exampleDir}/${dir}.`);
+        } else {
+          await fs.promises.rm(oldDirPath, { recursive: true, force: true });
+          console.log(`❌ /${dir} deleted.`);
+        }
+      } else {
+        console.log(`➡️ /${dir} does not exist, skipping.`);
+      }
+    }
+
+    // Create new /src/app directory
+    const newAppDirPath = path.join(root, newAppDir);
+    await fs.promises.mkdir(newAppDirPath, { recursive: true });
+    console.log("\n📁 New /src/app directory created.");
+
+    // Create index.tsx
+    const indexPath = path.join(newAppDirPath, "index.tsx");
+    await fs.promises.writeFile(indexPath, indexContent);
+    console.log("📄 src/app/index.tsx created.");
+
+    // Create _layout.tsx
+    const layoutPath = path.join(newAppDirPath, "_layout.tsx");
+    await fs.promises.writeFile(layoutPath, layoutContent);
+    console.log("📄 src/app/_layout.tsx created.");
+
+    console.log("\n✅ Project reset complete. Next steps:");
+    console.log(
+      `1. Run \`npx expo start\` to start a development server.\n2. Edit src/app/index.tsx to edit the main screen.\n3. Put all your application code in /src, only screens and layout files should be in /src/app.${
+        userInput === "y"
+          ? `\n4. Delete the /${exampleDir} directory when you're done referencing it.`
+          : ""
+      }`
+    );
+  } catch (error) {
+    console.error(`❌ Error during script execution: ${error.message}`);
+  }
+};
+
+rl.question(
+  "Do you want to move existing files to /example instead of deleting them? (Y/n): ",
+  (answer) => {
+    const userInput = answer.trim().toLowerCase() || "y";
+    if (userInput === "y" || userInput === "n") {
+      moveDirectories(userInput).finally(() => rl.close());
+    } else {
+      console.log("❌ Invalid input. Please enter 'Y' or 'N'.");
+      rl.close();
+    }
+  }
+);
+</file>
+
+<file path="src/app/(tabs)/_layout.tsx">
+import { Tabs } from 'expo-router';
+import { Home, Grid, Heart } from 'lucide-react-native';
+
+export default function TabLayout() {
+  return (
+    <Tabs
+      screenOptions={{
+        headerShown: false,
+        tabBarStyle: {
+          backgroundColor: '#1B4332',
+          borderTopWidth: 0,
+          elevation: 0,
+        },
+        tabBarActiveTintColor: '#D4AF37',
+        tabBarInactiveTintColor: '#A0A0A0',
+      }}
+    >
+      <Tabs.Screen
+        name="index"
+        options={{
+          title: 'Home',
+          tabBarIcon: ({ color }) => <Home color={color} size={24} />,
+        }}
+      />
+      <Tabs.Screen
+        name="deen-hub"
+        options={{
+          title: 'Deen Hub',
+          tabBarIcon: ({ color }) => <Grid color={color} size={24} />,
+        }}
+      />
+      <Tabs.Screen
+        name="taqwa"
+        options={{
+          title: 'Taqwa',
+          tabBarIcon: ({ color }) => <Heart color={color} size={24} />,
+        }}
+      />
+    </Tabs>
+  );
+}
+</file>
+
+<file path="src/app/(tabs)/deen-hub.tsx">
+import React from 'react';
+import { View, Text, StyleSheet, ScrollView, SafeAreaView, TouchableOpacity } from 'react-native';
+import { BookOpen, Clock, Book, Heart, MessageCircle, HelpCircle, Video, List, DollarSign, Calendar, Navigation, PlusSquare, BookMarked, MessageSquare } from 'lucide-react-native';
+
+const FEATURES = [
+  { name: 'Tafseer', icon: BookOpen },
+  { name: 'Prayer Times', icon: Clock },
+  { name: 'Quran', icon: Book },
+  { name: 'Dua', icon: Heart },
+  { name: 'Books', icon: BookMarked },
+  { name: 'Hadith', icon: BookOpen },
+  { name: 'Masail', icon: MessageCircle },
+  { name: 'Quiz', icon: HelpCircle },
+  { name: 'Bayan', icon: Video },
+  { name: 'Quran Learning', icon: Book },
+  { name: 'Articles', icon: List },
+  { name: 'Tasbih', icon: PlusSquare },
+  { name: 'Namaz Guide', icon: Navigation },
+  { name: 'Hajj & Umrah', icon: Navigation },
+  { name: 'Roza', icon: Calendar },
+  { name: 'Zakat', icon: DollarSign },
+];
+
+export default function DeenHub() {
+  return (
+    <SafeAreaView style={styles.container}>
+      <ScrollView contentContainerStyle={styles.scrollContent}>
+        <View style={styles.grid}>
+          {FEATURES.map((feature, index) => {
+            const Icon = feature.icon;
+            return (
+              <TouchableOpacity key={index} style={styles.card}>
+                <Icon color="#D4AF37" size={32} />
+                <Text style={styles.cardText} numberOfLines={2}>
+                  {feature.name}
+                </Text>
+              </TouchableOpacity>
+            );
+          })}
+        </View>
+      </ScrollView>
+    </SafeAreaView>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#0A192F', // Dark navy background
+  },
+  scrollContent: {
+    padding: 15,
+    marginTop: 20,
+  },
+  grid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+  },
+  card: {
+    width: '23%', // 4 items per row approximately
+    aspectRatio: 0.8,
+    backgroundColor: '#1B4332',
+    borderRadius: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 15,
+    padding: 10,
+    borderWidth: 1,
+    borderColor: 'rgba(212, 175, 55, 0.3)',
+  },
+  cardText: {
+    color: '#D4AF37',
+    fontSize: 12,
+    marginTop: 8,
+    textAlign: 'center',
+  },
+});
+</file>
+
+<file path="src/app/(tabs)/index.tsx">
+import React, { useState, useEffect } from 'react';
+import { View, Text, StyleSheet, ScrollView, SafeAreaView, TouchableOpacity, ActivityIndicator } from 'react-native';
+import { Moon, Bell, Sun } from 'lucide-react-native';
+import * as Location from 'expo-location';
+import axios from 'axios';
+
+interface PrayerTime {
+  name: string;
+  time: string;
+  icon: any;
+}
+
+export default function Home() {
+  const [currentTime, setCurrentTime] = useState(new Date());
+  const [prayerTimes, setPrayerTimes] = useState<PrayerTime[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [locationError, setLocationError] = useState<string | null>(null);
+
+  // Time updater
+  useEffect(() => {
+    const timer = setInterval(() => setCurrentTime(new Date()), 1000);
+    return () => clearInterval(timer);
+  }, []);
+
+  // Fetch location and prayer times
+  useEffect(() => {
+    (async () => {
+      try {
+        let { status } = await Location.requestForegroundPermissionsAsync();
+        if (status !== 'granted') {
+          setLocationError('Permission to access location was denied');
+          setLoading(false);
+          return;
+        }
+
+        let location = await Location.getCurrentPositionAsync({});
+        const { latitude, longitude } = location.coords;
+        
+        // Fetch from Aladhan API
+        const response = await axios.get(
+          `http://api.aladhan.com/v1/timings?latitude=${latitude}&longitude=${longitude}&method=2`
+        );
+        
+        const timings = response.data.data.timings;
+        
+        // Format to 12-hour string (basic implementation)
+        const formatApiTime = (timeStr: string) => {
+          const [h, m] = timeStr.split(':');
+          const date = new Date();
+          date.setHours(parseInt(h, 10));
+          date.setMinutes(parseInt(m, 10));
+          return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        };
+
+        const fetchedTimes: PrayerTime[] = [
+          { name: 'Fajr', time: formatApiTime(timings.Fajr), icon: Sun },
+          { name: 'Dhuhr', time: formatApiTime(timings.Dhuhr), icon: Sun },
+          { name: 'Asr', time: formatApiTime(timings.Asr), icon: Sun },
+          { name: 'Maghrib', time: formatApiTime(timings.Maghrib), icon: Moon },
+          { name: 'Isha', time: formatApiTime(timings.Isha), icon: Moon },
+        ];
+        
+        setPrayerTimes(fetchedTimes);
+      } catch (err) {
+        console.error("Error fetching prayer times:", err);
+        setLocationError('Failed to load prayer times');
+      } finally {
+        setLoading(false);
+      }
+    })();
+  }, []);
+
+  const formatTime = (date: Date) => {
+    return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  };
+
+  // Determine active prayer (simplistic approach based on current time)
+  const getActivePrayer = () => {
+    if (!prayerTimes.length) return null;
+    // Real implementation would compare parsed Date objects.
+    // We will just highlight Maghrib for demonstration purposes based on the mock.
+    return 'Maghrib';
+  };
+
+  const activePrayerName = getActivePrayer();
+
+  return (
+    <SafeAreaView style={styles.container}>
+      <View style={styles.header}>
+        <View style={styles.logoContainer}>
+          <Moon color="#D4AF37" size={32} />
+          <Text style={styles.appName}>Takwa</Text>
+        </View>
+        <TouchableOpacity>
+          <Bell color="#D4AF37" size={24} />
+          <Text style={styles.bellText}>Azan</Text>
+        </TouchableOpacity>
+      </View>
+
+      <View style={styles.clockContainer}>
+        <Text style={styles.clockText}>{formatTime(currentTime)}</Text>
+      </View>
+
+      <ScrollView contentContainerStyle={styles.prayerCardsContainer}>
+        {loading ? (
+          <ActivityIndicator size="large" color="#D4AF37" />
+        ) : locationError ? (
+          <Text style={styles.errorText}>{locationError}</Text>
+        ) : (
+          <View style={styles.grid}>
+            {prayerTimes.map((prayer) => {
+              const Icon = prayer.icon;
+              const isActive = prayer.name === activePrayerName;
+              
+              return (
+                <View 
+                  key={prayer.name} 
+                  style={[
+                    styles.prayerCard,
+                    isActive && styles.activePrayerCard
+                  ]}
+                >
+                  <Icon color={isActive ? '#D4AF37' : '#FFFFFF'} size={32} />
+                  <Text style={[styles.prayerName, isActive && styles.activeText]}>{prayer.name}</Text>
+                  <Text style={[styles.prayerTime, isActive && styles.activeText]}>{prayer.time}</Text>
+                </View>
+              );
+            })}
+          </View>
+        )}
+      </ScrollView>
+    </SafeAreaView>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#0F2F20',
+  },
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: 20,
+    marginTop: 20,
+  },
+  logoContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  appName: {
+    color: '#D4AF37',
+    fontSize: 28,
+    fontWeight: 'bold',
+    marginLeft: 10,
+  },
+  bellText: {
+    color: '#D4AF37',
+    fontSize: 12,
+    marginTop: 4,
+  },
+  clockContainer: {
+    alignItems: 'center',
+    marginVertical: 40,
+  },
+  clockText: {
+    color: '#FFFFFF',
+    fontSize: 64,
+    fontWeight: 'bold',
+  },
+  prayerCardsContainer: {
+    paddingHorizontal: 20,
+  },
+  grid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+  },
+  prayerCard: {
+    width: '48%',
+    backgroundColor: '#1B4332',
+    padding: 20,
+    borderRadius: 16,
+    alignItems: 'center',
+    marginBottom: 15,
+  },
+  activePrayerCard: {
+    backgroundColor: '#1B4332',
+    borderColor: '#D4AF37',
+    borderWidth: 2,
+  },
+  prayerName: {
+    color: '#FFFFFF',
+    fontSize: 18,
+    fontWeight: '600',
+    marginTop: 10,
+  },
+  prayerTime: {
+    color: '#A0A0A0',
+    fontSize: 14,
+    marginTop: 5,
+  },
+  activeText: {
+    color: '#D4AF37',
+  },
+  errorText: {
+    color: '#FF4444',
+    textAlign: 'center',
+    marginTop: 20,
+  }
+});
+</file>
+
+<file path="src/app/(tabs)/taqwa.tsx">
+import React, { useState, useEffect, useRef } from 'react';
+import { View, Text, StyleSheet, ScrollView, SafeAreaView, TouchableOpacity, Modal } from 'react-native';
+import { useSelector, useDispatch } from 'react-redux';
+import { RootState } from '../../store/store';
+import { addDeed, addSin, setScore } from '../../store/taqwaSlice';
+import { Check, AlertTriangle, Book } from 'lucide-react-native';
+import LottieView from 'lottie-react-native';
+import { getDailyAISuggestion } from '../../services/aiService';
+import { syncScoreToFirestore, fetchTodayScoreFromFirestore } from '../../services/dbService';
+import { auth } from '../../services/firebase';
+
+const GOOD_DEEDS = [
+  { name: 'Performing Salah', points: 100 },
+  { name: 'Giving Sadaqah', points: 80 },
+  { name: 'Reading Quran', points: 70 },
+  { name: 'Helping others', points: 60 },
+  { name: 'Making Istighfar', points: 50 },
+  { name: 'Fasting', points: 150 },
+  { name: 'Doing Dhikr', points: 40 },
+];
+
+const SINS = [
+  { name: 'Lying', points: 80 },
+  { name: 'Missing Salah', points: 100 },
+  { name: 'Backbiting', points: 70 },
+  { name: 'Watching Haram', points: 90 },
+  { name: 'Wasting time', points: 40 },
+  { name: 'Disrespecting parents', points: 120 },
+];
+
+export default function Taqwa() {
+  const score = useSelector((state: RootState) => state.taqwa.score);
+  const dispatch = useDispatch();
+  const [modalVisible, setModalVisible] = useState(false);
+  const [aiSuggestion, setAiSuggestion] = useState('Loading daily suggestion...');
+  const isInitialMount = useRef(true);
+
+  const isPositive = score >= 0;
+
+  // Initial load: Fetch today's score from Firestore
+  useEffect(() => {
+    const initScore = async () => {
+      // Wait a moment for anonymous auth to complete if app just launched
+      setTimeout(async () => {
+        const savedScore = await fetchTodayScoreFromFirestore();
+        if (savedScore !== null) {
+          dispatch(setScore(savedScore));
+        }
+      }, 1000);
+    };
+    initScore();
+  }, []);
+
+  // Sync to Firestore whenever score changes (but skip the initial mount)
+  useEffect(() => {
+    if (isInitialMount.current) {
+      isInitialMount.current = false;
+      return;
+    }
+    syncScoreToFirestore(score);
+  }, [score]);
+
+  useEffect(() => {
+    // Fetch AI suggestion when the app loads or score changes significantly
+    // In a real app, this might only be fetched once per day
+    const fetchSuggestion = async () => {
+      const suggestion = await getDailyAISuggestion(score);
+      setAiSuggestion(suggestion);
+    };
+    fetchSuggestion();
+  }, [isPositive]); // Only refetch if the polarity changes
+
+  return (
+    <SafeAreaView style={[styles.container, isPositive ? styles.positiveBg : styles.negativeBg]}>
+      {/* Background Lottie Animation */}
+      <View style={StyleSheet.absoluteFill} pointerEvents="none">
+        <LottieView
+          source={isPositive ? require('../../../assets/garden.json') : require('../../../assets/fire.json')}
+          autoPlay
+          loop
+          style={styles.lottieBackground}
+          resizeMode="cover"
+        />
+      </View>
+
+      <ScrollView contentContainerStyle={styles.scrollContent}>
+        
+        {/* Score Card */}
+        <View style={styles.scoreCard}>
+          <Text style={styles.scoreLabel}>Taqwa Points:</Text>
+          <Text style={[styles.scoreValue, { color: isPositive ? '#D4AF37' : '#FF4444' }]}>
+            {score.toLocaleString()}
+          </Text>
+        </View>
+
+        {/* AI Suggestion */}
+        <View style={styles.suggestionCard}>
+          <Text style={styles.suggestionTitle}>Daily AI Suggestion</Text>
+          <Text style={styles.suggestionText}>
+            {aiSuggestion}
+          </Text>
+          <View style={styles.checkIcon}>
+            <Check color="#D4AF37" size={20} />
+          </View>
+        </View>
+
+        {/* Action Button */}
+        <TouchableOpacity 
+          style={styles.logButton}
+          onPress={() => setModalVisible(true)}
+        >
+          <Book color="#D4AF37" size={24} />
+          <Text style={styles.logButtonText}>Deed Log</Text>
+        </TouchableOpacity>
+
+        {/* Dynamic Content */}
+        <View style={styles.dynamicContent}>
+          {isPositive ? (
+            <>
+              <Text style={styles.verseText}>"Verily, with hardship comes ease."</Text>
+              <Text style={styles.verseSource}>- Quran 94:6</Text>
+              <Text style={styles.arabicText}>ٱلْحَمْدُ لِلَّٰهِ</Text>
+            </>
+          ) : (
+            <>
+              <Text style={styles.warningText}>
+                **You are accumulating sins! Repent now and do good deeds before it's too late**
+              </Text>
+              <View style={styles.warningIconContainer}>
+                <AlertTriangle color="#FF4444" size={40} />
+                <Text style={styles.arabicTextNegative}>أستغفر الله</Text>
+                <AlertTriangle color="#FF4444" size={40} />
+              </View>
+            </>
+          )}
+        </View>
+
+        {/* Modal for Logging Deeds/Sins */}
+        <Modal
+          animationType="slide"
+          transparent={true}
+          visible={modalVisible}
+          onRequestClose={() => setModalVisible(false)}
+        >
+          <View style={styles.modalOverlay}>
+            <View style={styles.modalContent}>
+              <Text style={styles.modalTitle}>Log Activity</Text>
+              
+              <Text style={styles.sectionTitle}>Good Deeds (+)</Text>
+              {GOOD_DEEDS.map((deed, idx) => (
+                <TouchableOpacity 
+                  key={`deed-${idx}`}
+                  style={styles.deedRow}
+                  onPress={() => {
+                    dispatch(addDeed(deed.points));
+                    setModalVisible(false);
+                  }}
+                >
+                  <Text style={styles.deedName}>{deed.name}</Text>
+                  <Text style={styles.deedPoints}>+{deed.points}</Text>
+                </TouchableOpacity>
+              ))}
+
+              <Text style={[styles.sectionTitle, { color: '#FF4444', marginTop: 20 }]}>Sins (-)</Text>
+              {SINS.map((sin, idx) => (
+                <TouchableOpacity 
+                  key={`sin-${idx}`}
+                  style={styles.sinRow}
+                  onPress={() => {
+                    dispatch(addSin(sin.points));
+                    setModalVisible(false);
+                  }}
+                >
+                  <Text style={styles.sinName}>{sin.name}</Text>
+                  <Text style={styles.sinPoints}>-{sin.points}</Text>
+                </TouchableOpacity>
+              ))}
+
+              <TouchableOpacity 
+                style={styles.closeButton}
+                onPress={() => setModalVisible(false)}
+              >
+                <Text style={styles.closeButtonText}>Close</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </Modal>
+
+      </ScrollView>
+    </SafeAreaView>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+  positiveBg: {
+    backgroundColor: '#0F2F20',
+  },
+  negativeBg: {
+    backgroundColor: '#300000',
+  },
+  lottieBackground: {
+    width: '100%',
+    height: '100%',
+    opacity: 0.3, // Semi-transparent so text is readable
+  },
+  scrollContent: {
+    padding: 20,
+    marginTop: 20,
+  },
+  scoreCard: {
+    backgroundColor: '#1B4332',
+    padding: 20,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: '#D4AF37',
+    alignItems: 'center',
+    marginBottom: 20,
+  },
+  scoreLabel: {
+    color: '#FFFFFF',
+    fontSize: 16,
+  },
+  scoreValue: {
+    fontSize: 48,
+    fontWeight: 'bold',
+    marginTop: 10,
+  },
+  suggestionCard: {
+    backgroundColor: '#1B4332',
+    padding: 20,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: '#D4AF37',
+    marginBottom: 20,
+    position: 'relative',
+  },
+  suggestionTitle: {
+    color: '#FFFFFF',
+    fontSize: 16,
+    fontWeight: 'bold',
+    marginBottom: 10,
+  },
+  suggestionText: {
+    color: '#A0A0A0',
+    fontSize: 14,
+    lineHeight: 20,
+    paddingRight: 30,
+  },
+  checkIcon: {
+    position: 'absolute',
+    right: 20,
+    bottom: 20,
+  },
+  logButton: {
+    flexDirection: 'row',
+    backgroundColor: '#1B4332',
+    padding: 15,
+    borderRadius: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1,
+    borderColor: '#D4AF37',
+    marginBottom: 40,
+  },
+  logButtonText: {
+    color: '#FFFFFF',
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginLeft: 10,
+  },
+  dynamicContent: {
+    alignItems: 'center',
+    marginTop: 20,
+  },
+  verseText: {
+    color: '#D4AF37',
+    fontSize: 24,
+    textAlign: 'center',
+    fontStyle: 'italic',
+    marginBottom: 10,
+  },
+  verseSource: {
+    color: '#A0A0A0',
+    fontSize: 16,
+    marginBottom: 30,
+  },
+  arabicText: {
+    color: '#FFFFFF',
+    fontSize: 48,
+    fontWeight: 'bold',
+    textAlign: 'center',
+  },
+  warningText: {
+    color: '#FF4444',
+    fontSize: 18,
+    textAlign: 'center',
+    fontWeight: 'bold',
+    marginBottom: 30,
+    lineHeight: 24,
+  },
+  warningIconContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-around',
+    width: '100%',
+  },
+  arabicTextNegative: {
+    color: '#FF4444',
+    fontSize: 40,
+    fontWeight: 'bold',
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.7)',
+    justifyContent: 'flex-end',
+  },
+  modalContent: {
+    backgroundColor: '#0A192F',
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    padding: 20,
+    maxHeight: '80%',
+  },
+  modalTitle: {
+    color: '#D4AF37',
+    fontSize: 24,
+    fontWeight: 'bold',
+    marginBottom: 20,
+    textAlign: 'center',
+  },
+  sectionTitle: {
+    color: '#4CAF50',
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 10,
+  },
+  deedRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: '#1B4332',
+  },
+  deedName: {
+    color: '#FFFFFF',
+    fontSize: 16,
+  },
+  deedPoints: {
+    color: '#4CAF50',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  sinRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: '#300000',
+  },
+  sinName: {
+    color: '#FFFFFF',
+    fontSize: 16,
+  },
+  sinPoints: {
+    color: '#FF4444',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  closeButton: {
+    backgroundColor: '#1B4332',
+    padding: 15,
+    borderRadius: 12,
+    alignItems: 'center',
+    marginTop: 20,
+  },
+  closeButtonText: {
+    color: '#FFFFFF',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+});
+</file>
+
+<file path="src/services/aiService.ts">
+import axios from 'axios';
+
+// Add this to your environment variables later (.env)
+const OPENAI_API_KEY = process.env.EXPO_PUBLIC_OPENAI_API_KEY || '';
+
+export const getDailyAISuggestion = async (score: number) => {
+  if (!OPENAI_API_KEY) {
+    // Fallback if no API key is provided
+    return score >= 0
+      ? "Today's suggestion: Give charity, however small."
+      : "Today's must-do: Give Sadaqah, Read 10 Ayahs, Make Istighfar 100 times.";
+  }
+
+  try {
+    const prompt = score >= 0 
+      ? "The user has a positive Taqwa (piety) score today. Give a short, encouraging 1-sentence Islamic suggestion to do a good deed today."
+      : "The user has a negative Taqwa (piety) score today, meaning they have sinned or missed prayers. Give a short, firm but merciful 1-sentence Islamic suggestion to repent and do specific good deeds today.";
+
+    const response = await axios.post(
+      'https://api.openai.com/v1/chat/completions',
+      {
+        model: 'gpt-4o-mini',
+        messages: [{ role: 'system', content: prompt }],
+        max_tokens: 50,
+      },
+      {
+        headers: {
+          'Authorization': `Bearer ${OPENAI_API_KEY}`,
+          'Content-Type': 'application/json',
+        },
+      }
+    );
+
+    return response.data.choices[0].message.content.trim();
+  } catch (error) {
+    console.error("AI Service Error:", error);
+    return "Make Istighfar and renew your intentions today.";
+  }
+};
+</file>
+
+<file path="src/services/dbService.ts">
+import { doc, setDoc, getDoc } from 'firebase/firestore';
+import { db, auth } from './firebase';
+
+export const syncScoreToFirestore = async (score: number) => {
+  if (!auth.currentUser) return;
+  
+  const userId = auth.currentUser.uid;
+  const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
+  
+  try {
+    const userDocRef = doc(db, 'users', userId, 'daily_scores', today);
+    await setDoc(userDocRef, {
+      score: score,
+      lastUpdated: new Date().toISOString()
+    }, { merge: true });
+  } catch (error) {
+    console.error("Error syncing score to Firestore:", error);
+  }
+};
+
+export const fetchTodayScoreFromFirestore = async (): Promise<number | null> => {
+  if (!auth.currentUser) return null;
+
+  const userId = auth.currentUser.uid;
+  const today = new Date().toISOString().split('T')[0];
+  
+  try {
+    const userDocRef = doc(db, 'users', userId, 'daily_scores', today);
+    const docSnap = await getDoc(userDocRef);
+    
+    if (docSnap.exists()) {
+      return docSnap.data().score;
+    }
+  } catch (error) {
+    console.error("Error fetching score from Firestore:", error);
+  }
+  
+  return null;
+};
+</file>
+
+<file path="src/services/firebase.ts">
+import { initializeApp, getApps, getApp } from 'firebase/app';
+import { getAuth, signInAnonymously } from 'firebase/auth';
+import { getFirestore } from 'firebase/firestore';
+
+// Your web app's Firebase configuration
+// Replace these with your actual config from Firebase Console
+const firebaseConfig = {
+  apiKey: process.env.EXPO_PUBLIC_FIREBASE_API_KEY || "YOUR_API_KEY",
+  authDomain: process.env.EXPO_PUBLIC_FIREBASE_AUTH_DOMAIN || "YOUR_AUTH_DOMAIN",
+  projectId: process.env.EXPO_PUBLIC_FIREBASE_PROJECT_ID || "YOUR_PROJECT_ID",
+  storageBucket: process.env.EXPO_PUBLIC_FIREBASE_STORAGE_BUCKET || "YOUR_STORAGE_BUCKET",
+  messagingSenderId: process.env.EXPO_PUBLIC_FIREBASE_MESSAGING_SENDER_ID || "YOUR_MESSAGING_SENDER_ID",
+  appId: process.env.EXPO_PUBLIC_FIREBASE_APP_ID || "YOUR_APP_ID"
+};
+
+// Initialize Firebase
+const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApp();
+
+export const auth = getAuth(app);
+export const db = getFirestore(app);
+
+// Simple helper to sign in anonymously for now to allow DB writes
+export const loginAnonymously = async () => {
+  try {
+    const userCredential = await signInAnonymously(auth);
+    return userCredential.user;
+  } catch (error) {
+    console.error("Firebase Anonymous Auth Error:", error);
+    return null;
+  }
+};
+</file>
+
+<file path="src/store/store.ts">
+import { configureStore } from '@reduxjs/toolkit';
+import taqwaReducer from './taqwaSlice';
+
+export const store = configureStore({
+  reducer: {
+    taqwa: taqwaReducer,
+  },
+});
+
+export type RootState = ReturnType<typeof store.getState>;
+export type AppDispatch = typeof store.dispatch;
+</file>
+
+<file path="src/store/taqwaSlice.ts">
+import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+
+interface TaqwaState {
+  score: number;
+}
+
+const initialState: TaqwaState = {
+  score: 0,
+};
+
+export const taqwaSlice = createSlice({
+  name: 'taqwa',
+  initialState,
+  reducers: {
+    addDeed: (state, action: PayloadAction<number>) => {
+      state.score += action.payload;
+    },
+    addSin: (state, action: PayloadAction<number>) => {
+      state.score -= action.payload;
+    },
+    resetScore: (state) => {
+      state.score = 0;
+    },
+    setScore: (state, action: PayloadAction<number>) => {
+      state.score = action.payload;
+    },
+  },
+});
+
+export const { addDeed, addSin, resetScore, setScore } = taqwaSlice.actions;
+
+export default taqwaSlice.reducer;
+</file>
+
+<file path=".gitignore">
+# Learn more https://docs.github.com/en/get-started/getting-started-with-git/ignoring-files
+
+# dependencies
+node_modules/
+
+# Expo
+.expo/
+dist/
+web-build/
+expo-env.d.ts
+
+# Native
+.kotlin/
+*.orig.*
+*.jks
+*.p8
+*.p12
+*.key
+*.mobileprovision
+
+# Metro
+.metro-health-check*
+
+# debug
+npm-debug.*
+yarn-debug.*
+yarn-error.*
+
+# macOS
+.DS_Store
+*.pem
+
+# local env files
+.env*.local
+
+# typescript
+*.tsbuildinfo
+
+example
+
+# generated native folders
+/ios
+/android
+</file>
+
+<file path="AGENTS.md">
+# Expo HAS CHANGED
+
+Read the exact versioned docs at https://docs.expo.dev/versions/v56.0.0/ before writing any code.
+</file>
+
+<file path="CLAUDE.md">
+@AGENTS.md
+</file>
+
+<file path="LICENSE">
+The MIT License (MIT)
+
+Copyright (c) 2015-present 650 Industries, Inc. (aka Expo)
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+</file>
+
+<file path="README.md">
+# Welcome to your Expo app 👋
+
+This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+
+## Get started
+
+1. Install dependencies
+
+   ```bash
+   npm install
+   ```
+
+2. Start the app
+
+   ```bash
+   npx expo start
+   ```
+
+In the output, you'll find options to open the app in a
+
+- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
+- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
+- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
+- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+
+You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+
+## Get a fresh project
+
+When you're ready, run:
+
+```bash
+npm run reset-project
+```
+
+This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+
+### Other setup steps
+
+- To set up ESLint for linting, run `npx expo lint`, or follow our guide on ["Using ESLint and Prettier"](https://docs.expo.dev/guides/using-eslint/)
+- If you'd like to set up unit testing, follow our guide on ["Unit Testing with Jest"](https://docs.expo.dev/develop/unit-testing/)
+- Learn more about the TypeScript setup in this template in our guide on ["Using TypeScript"](https://docs.expo.dev/guides/typescript/)
+
+## Learn more
+
+To learn more about developing your project with Expo, look at the following resources:
+
+- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
+- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+
+## Join the community
+
+Join our community of developers creating universal apps.
+
+- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
+- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+</file>
+
+<file path="tsconfig.json">
+{
+  "extends": "expo/tsconfig.base",
+  "compilerOptions": {
+    "strict": true,
+    "paths": {
+      "@/*": [
+        "./src/*"
+      ],
+      "@/assets/*": [
+        "./assets/*"
+      ]
+    }
+  },
+  "include": [
+    "**/*.ts",
+    "**/*.tsx",
+    ".expo/types/**/*.ts",
+    "expo-env.d.ts"
+  ]
+}
+</file>
+
+<file path="src/app/_layout.tsx">
+import { Stack } from 'expo-router';
+import { PaperProvider } from 'react-native-paper';
+import { Provider as ReduxProvider } from 'react-redux';
+import { store } from '../store/store';
+import { StatusBar } from 'expo-status-bar';
+import { useEffect } from 'react';
+import { loginAnonymously } from '../services/firebase';
+
+export default function RootLayout() {
+  useEffect(() => {
+    // Authenticate user anonymously on app launch
+    // This allows them to start logging deeds immediately
+    loginAnonymously();
+  }, []);
+
+  return (
+    <ReduxProvider store={store}>
+      <PaperProvider>
+        <Stack screenOptions={{ headerShown: false }}>
+          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+        </Stack>
+        <StatusBar style="light" />
+      </PaperProvider>
+    </ReduxProvider>
+  );
+}
+</file>
+
+<file path="app.json">
+{
+  "expo": {
+    "name": "taqwa",
+    "slug": "taqwa",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/images/icon.png",
+    "scheme": "taqwa",
+    "userInterfaceStyle": "automatic",
+    "ios": {
+      "icon": "./assets/expo.icon"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "backgroundColor": "#E6F4FE",
+        "foregroundImage": "./assets/images/android-icon-foreground.png",
+        "backgroundImage": "./assets/images/android-icon-background.png",
+        "monochromeImage": "./assets/images/android-icon-monochrome.png"
+      },
+      "predictiveBackGestureEnabled": false,
+      "package": "com.anonymous.taqwa"
+    },
+    "web": {
+      "output": "static",
+      "favicon": "./assets/images/favicon.png"
+    },
+    "plugins": [
+      "expo-router",
+      [
+        "expo-splash-screen",
+        {
+          "backgroundColor": "#208AEF",
+          "android": {
+            "image": "./assets/images/splash-icon.png",
+            "imageWidth": 76
+          }
+        }
+      ]
+    ],
+    "experiments": {
+      "typedRoutes": true,
+      "reactCompiler": true
+    }
+  }
+}
+</file>
+
+<file path="package.json">
+{
+  "name": "taqwa",
+  "main": "expo-router/entry",
+  "version": "1.0.0",
+  "dependencies": {
+    "@expo/ui": "~56.0.11",
+    "@react-native-async-storage/async-storage": "^3.1.0",
+    "@reduxjs/toolkit": "^2.12.0",
+    "axios": "^1.16.1",
+    "date-fns": "^4.2.1",
+    "expo": "~56.0.3",
+    "expo-constants": "~56.0.14",
+    "expo-dev-client": "~56.0.14",
+    "expo-device": "~56.0.4",
+    "expo-font": "~56.0.5",
+    "expo-glass-effect": "~56.0.4",
+    "expo-image": "~56.0.8",
+    "expo-linking": "~56.0.11",
+    "expo-location": "~56.0.12",
+    "expo-router": "~56.2.5",
+    "expo-splash-screen": "~56.0.9",
+    "expo-status-bar": "~56.0.4",
+    "expo-symbols": "~56.0.5",
+    "expo-system-ui": "~56.0.5",
+    "expo-web-browser": "~56.0.5",
+    "firebase": "^12.13.0",
+    "lottie-react-native": "^7.3.8",
+    "lucide-react-native": "^1.16.0",
+    "react": "19.2.3",
+    "react-dom": "19.2.3",
+    "react-native": "0.85.3",
+    "react-native-gesture-handler": "~2.31.1",
+    "react-native-paper": "^5.15.2",
+    "react-native-reanimated": "4.3.1",
+    "react-native-safe-area-context": "~5.7.0",
+    "react-native-screens": "4.25.1",
+    "react-native-web": "~0.21.0",
+    "react-native-worklets": "0.8.3",
+    "react-redux": "^9.3.0",
+    "redux": "^5.0.1"
+  },
+  "devDependencies": {
+    "@types/react": "~19.2.2",
+    "typescript": "~6.0.3"
+  },
+  "scripts": {
+    "start": "expo start",
+    "reset-project": "node ./scripts/reset-project.js",
+    "android": "expo run:android",
+    "ios": "expo run:ios",
+    "web": "expo start --web",
+    "lint": "expo lint"
+  },
+  "private": true
+}
+</file>
+
+</files>

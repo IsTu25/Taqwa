@@ -1,5 +1,6 @@
 import React from 'react';
-import { View, Text, StyleSheet, ScrollView, SafeAreaView, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { BookOpen, Clock, Book, Heart, MessageCircle, HelpCircle, Video, List, DollarSign, Calendar, Navigation, PlusSquare, BookMarked, MessageSquare } from 'lucide-react-native';
 
 const FEATURES = [
