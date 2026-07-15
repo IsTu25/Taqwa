@@ -1,6 +1,7 @@
 import { initializeApp, getApps, getApp } from 'firebase/app';
 import {
   initializeAuth,
+  // @ts-ignore - The function exists at runtime but is missing from Firebase standard TS typings
   getReactNativePersistence,
   getAuth,
   onAuthStateChanged,

@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, ImageBackground } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { BookOpen, Clock, Book, Heart, MessageCircle, HelpCircle, Video, List, DollarSign, Calendar, Navigation, PlusSquare, BookMarked, MessageSquare } from 'lucide-react-native';
 
@@ -24,8 +24,9 @@ const FEATURES = [
 
 export default function DeenHub() {
   return (
-    <SafeAreaView style={styles.container}>
-      <ScrollView contentContainerStyle={styles.scrollContent}>
+    <ImageBackground source={require('../../../assets/images/2nd page.png')} style={styles.backgroundImage}>
+      <SafeAreaView style={styles.container}>
+        <ScrollView contentContainerStyle={styles.scrollContent}>
         <View style={styles.grid}>
           {FEATURES.map((feature, index) => {
             const Icon = feature.icon;
@@ -41,13 +42,18 @@ export default function DeenHub() {
         </View>
       </ScrollView>
     </SafeAreaView>
+  </ImageBackground>
   );
 }
 
 const styles = StyleSheet.create({
+  backgroundImage: {
+    flex: 1,
+    resizeMode: 'cover',
+  },
   container: {
     flex: 1,
-    backgroundColor: '#0A192F', // Dark navy background
+    backgroundColor: 'transparent',
   },
   scrollContent: {
     padding: 15,

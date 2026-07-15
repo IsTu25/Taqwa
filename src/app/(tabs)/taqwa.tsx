@@ -1,38 +1,21 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Modal } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Modal, ImageBackground, Alert, TextInput, ActivityIndicator } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from '../../store/store';
 import { addDeed, addSin, setScore } from '../../store/taqwaSlice';
 import { Check, AlertTriangle, Book } from 'lucide-react-native';
 import LottieView from 'lottie-react-native';
-import { getDailyAISuggestion } from '../../services/aiService';
+import { getDailyAISuggestion, evaluateDeedWithGemini } from '../../services/aiService';
 import { syncScoreToFirestore, fetchTodayScoreFromFirestore } from '../../services/dbService';
 import { auth } from '../../services/firebase';
-
-const GOOD_DEEDS = [
-  { name: 'Performing Salah', points: 100 },
-  { name: 'Giving Sadaqah', points: 80 },
-  { name: 'Reading Quran', points: 70 },
-  { name: 'Helping others', points: 60 },
-  { name: 'Making Istighfar', points: 50 },
-  { name: 'Fasting', points: 150 },
-  { name: 'Doing Dhikr', points: 40 },
-];
-
-const SINS = [
-  { name: 'Lying', points: 80 },
-  { name: 'Missing Salah', points: 100 },
-  { name: 'Backbiting', points: 70 },
-  { name: 'Watching Haram', points: 90 },
-  { name: 'Wasting time', points: 40 },
-  { name: 'Disrespecting parents', points: 120 },
-];
 
 export default function Taqwa() {
   const score = useSelector((state: RootState) => state.taqwa.score);
   const dispatch = useDispatch();
   const [modalVisible, setModalVisible] = useState(false);
+  const [userDeedText, setUserDeedText] = useState('');
+  const [isEvaluating, setIsEvaluating] = useState(false);
   const [aiSuggestion, setAiSuggestion] = useState('Loading daily suggestion...');
   const isInitialMount = useRef(true);
 
@@ -71,8 +54,41 @@ export default function Taqwa() {
     fetchSuggestion();
   }, [isPositive]); // Only refetch if the polarity changes
 
+  const handleEvaluateDeed = async () => {
+    if (!userDeedText.trim()) return;
+    setIsEvaluating(true);
+    const result = await evaluateDeedWithGemini(userDeedText);
+    setIsEvaluating(false);
+
+    if (result.type === 'good') {
+      Alert.alert("MashaAllah!", result.reference + "\n\nPoints Awarded: +" + result.points, [
+        {
+          text: "OK",
+          onPress: () => {
+            dispatch(addDeed(result.points));
+            setModalVisible(false);
+            setUserDeedText('');
+          },
+        },
+      ]);
+    } else {
+      Alert.alert("Astaghfirullah", result.reference + "\n\nPoints Deducted: -" + result.points, [
+        {
+          text: "OK",
+          style: "destructive",
+          onPress: () => {
+            dispatch(addSin(result.points));
+            setModalVisible(false);
+            setUserDeedText('');
+          },
+        },
+      ]);
+    }
+  };
+
   return (
-    <SafeAreaView style={[styles.container, isPositive ? styles.positiveBg : styles.negativeBg]}>
+    <ImageBackground source={require('../../../assets/images/3rd  page.png')} style={styles.backgroundImage}>
+      <SafeAreaView style={[styles.container, isPositive ? styles.positiveBg : styles.negativeBg]}>
       {/* Background Lottie Animation */}
       <View style={StyleSheet.absoluteFill} pointerEvents="none">
         <LottieView
@@ -147,35 +163,27 @@ export default function Taqwa() {
             <View style={styles.modalContent}>
               <Text style={styles.modalTitle}>Log Activity</Text>
               
-              <Text style={styles.sectionTitle}>Good Deeds (+)</Text>
-              {GOOD_DEEDS.map((deed, idx) => (
-                <TouchableOpacity 
-                  key={`deed-${idx}`}
-                  style={styles.deedRow}
-                  onPress={() => {
-                    dispatch(addDeed(deed.points));
-                    setModalVisible(false);
-                  }}
-                >
-                  <Text style={styles.deedName}>{deed.name}</Text>
-                  <Text style={styles.deedPoints}>+{deed.points}</Text>
-                </TouchableOpacity>
-              ))}
+              <Text style={styles.inputLabel}>What did you do today?</Text>
+              <TextInput
+                style={styles.textInput}
+                placeholder="e.g. I helped my neighbor carry groceries..."
+                placeholderTextColor="#A0A0A0"
+                multiline
+                value={userDeedText}
+                onChangeText={setUserDeedText}
+              />
 
-              <Text style={[styles.sectionTitle, { color: '#FF4444', marginTop: 20 }]}>Sins (-)</Text>
-              {SINS.map((sin, idx) => (
-                <TouchableOpacity 
-                  key={`sin-${idx}`}
-                  style={styles.sinRow}
-                  onPress={() => {
-                    dispatch(addSin(sin.points));
-                    setModalVisible(false);
-                  }}
-                >
-                  <Text style={styles.sinName}>{sin.name}</Text>
-                  <Text style={styles.sinPoints}>-{sin.points}</Text>
-                </TouchableOpacity>
-              ))}
+              <TouchableOpacity 
+                style={[styles.submitButton, (!userDeedText.trim() || isEvaluating) && styles.submitButtonDisabled]}
+                onPress={handleEvaluateDeed}
+                disabled={!userDeedText.trim() || isEvaluating}
+              >
+                {isEvaluating ? (
+                  <ActivityIndicator color="#FFFFFF" />
+                ) : (
+                  <Text style={styles.submitButtonText}>Evaluate Deed</Text>
+                )}
+              </TouchableOpacity>
 
               <TouchableOpacity 
                 style={styles.closeButton}
@@ -189,18 +197,23 @@ export default function Taqwa() {
 
       </ScrollView>
     </SafeAreaView>
+  </ImageBackground>
   );
 }
 
 const styles = StyleSheet.create({
+  backgroundImage: {
+    flex: 1,
+    resizeMode: 'cover',
+  },
   container: {
     flex: 1,
   },
   positiveBg: {
-    backgroundColor: '#0F2F20',
+    backgroundColor: 'transparent',
   },
   negativeBg: {
-    backgroundColor: '#300000',
+    backgroundColor: 'rgba(48, 0, 0, 0.5)',
   },
   lottieBackground: {
     width: '100%',
@@ -332,41 +345,33 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     textAlign: 'center',
   },
-  sectionTitle: {
-    color: '#4CAF50',
-    fontSize: 18,
-    fontWeight: 'bold',
+  inputLabel: {
+    color: '#FFFFFF',
+    fontSize: 16,
     marginBottom: 10,
   },
-  deedRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    paddingVertical: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: '#1B4332',
-  },
-  deedName: {
+  textInput: {
+    backgroundColor: '#1B4332',
     color: '#FFFFFF',
-    fontSize: 16,
+    borderRadius: 12,
+    padding: 15,
+    minHeight: 100,
+    textAlignVertical: 'top',
+    borderColor: '#D4AF37',
+    borderWidth: 1,
+    marginBottom: 20,
   },
-  deedPoints: {
-    color: '#4CAF50',
-    fontSize: 16,
-    fontWeight: 'bold',
+  submitButton: {
+    backgroundColor: '#D4AF37',
+    padding: 15,
+    borderRadius: 12,
+    alignItems: 'center',
   },
-  sinRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    paddingVertical: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: '#300000',
+  submitButtonDisabled: {
+    backgroundColor: '#A0A0A0',
   },
-  sinName: {
-    color: '#FFFFFF',
-    fontSize: 16,
-  },
-  sinPoints: {
-    color: '#FF4444',
+  submitButtonText: {
+    color: '#000000',
     fontSize: 16,
     fontWeight: 'bold',
   },

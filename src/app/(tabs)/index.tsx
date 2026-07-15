@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, ActivityIndicator, ImageBackground } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Moon, Bell, Sun } from 'lucide-react-native';
 import * as Location from 'expo-location';
@@ -34,7 +34,16 @@ export default function Home() {
           return;
         }
 
-        let location = await Location.getCurrentPositionAsync({});
+        let location = await Location.getLastKnownPositionAsync({});
+        if (!location) {
+          try {
+            location = await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Balanced, timeout: 5000 });
+          } catch (error) {
+            console.warn("Could not get exact location, using fallback (Mecca). Error:", error);
+            // Fallback to Mecca
+            location = { coords: { latitude: 21.4225, longitude: 39.8262 } } as any;
+          }
+        }
         const { latitude, longitude } = location.coords;
         
         // Fetch from Aladhan API
@@ -86,8 +95,9 @@ export default function Home() {
   const activePrayerName = getActivePrayer();
 
   return (
-    <SafeAreaView style={styles.container}>
-      <View style={styles.header}>
+    <ImageBackground source={require('../../../assets/images/homepage.png')} style={styles.backgroundImage}>
+      <SafeAreaView style={styles.container}>
+        <View style={styles.header}>
         <View style={styles.logoContainer}>
           <Moon color="#D4AF37" size={32} />
           <Text style={styles.appName}>Takwa</Text>
@@ -131,13 +141,18 @@ export default function Home() {
         )}
       </ScrollView>
     </SafeAreaView>
+  </ImageBackground>
   );
 }
 
 const styles = StyleSheet.create({
+  backgroundImage: {
+    flex: 1,
+    resizeMode: 'cover',
+  },
   container: {
     flex: 1,
-    backgroundColor: '#0F2F20',
+    backgroundColor: 'transparent',
   },
   header: {
     flexDirection: 'row',

@@ -2,6 +2,7 @@ import axios from 'axios';
 
 // Add this to your environment variables later (.env)
 const OPENAI_API_KEY = process.env.EXPO_PUBLIC_OPENAI_API_KEY || '';
+const GEMINI_API_KEY = process.env.EXPO_PUBLIC_GEMINI_API_KEY || '';
 
 export const getDailyAISuggestion = async (score: number) => {
   if (!OPENAI_API_KEY) {
@@ -35,5 +36,66 @@ export const getDailyAISuggestion = async (score: number) => {
   } catch (error) {
     console.error("AI Service Error:", error);
     return "Make Istighfar and renew your intentions today.";
+  }
+};
+
+export interface DeedEvaluation {
+  type: 'good' | 'bad';
+  points: number;
+  reference: string;
+}
+
+export const evaluateDeedWithGemini = async (userDeed: string): Promise<DeedEvaluation> => {
+  if (!GEMINI_API_KEY) {
+    // Fallback if no API key is provided
+    return {
+      type: 'good',
+      points: 10,
+      reference: 'Please add your Gemini API Key in .env to get AI evaluations.'
+    };
+  }
+
+  try {
+    const prompt = `
+      You are an Islamic assistant. The user has logged a daily activity: "${userDeed}".
+      Evaluate this activity based on Islamic teachings.
+      1. Determine if it is a good deed (good) or a sin/bad deed (bad).
+      2. Assign points from 10 to 200. Good deeds should be positive points, sins should be positive points that will be subtracted later (just return a positive absolute number).
+      3. Provide a short, inspiring Quranic verse or Hadith reference relating to this action (max 2 sentences).
+      
+      You must respond strictly in JSON format without any markdown wrappers or code blocks.
+      Example format:
+      {
+        "type": "good",
+        "points": 50,
+        "reference": "Allah multiplies the reward of charity from 70 to 700 times! (Quran 2:261)"
+      }
+    `;
+
+    const response = await axios.post(
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY}`,
+      {
+        contents: [{ parts: [{ text: prompt }] }],
+        generationConfig: {
+          responseMimeType: "application/json",
+        }
+      },
+      {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      }
+    );
+
+    const textResult = response.data.candidates[0].content.parts[0].text;
+    const parsed = JSON.parse(textResult);
+    return parsed as DeedEvaluation;
+  } catch (error) {
+    console.error("Gemini AI Service Error:", error);
+    return {
+      type: 'good',
+      points: 10,
+      reference: 'Error connecting to AI. May Allah reward your intention.'
+    };
   }
 };
