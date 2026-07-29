@@ -1,80 +1,76 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
-
-const QUIZ_QUESTIONS = [
-  {
-    question: 'How many Surahs are there in the Quran?',
-    options: ['112', '114', '120', '100'],
-    answer: 1,
-  },
-  {
-    question: 'Which prophet was swallowed by a whale?',
-    options: ['Musa (AS)', 'Isa (AS)', 'Yunus (AS)', 'Nuh (AS)'],
-    answer: 2,
-  },
-  {
-    question: 'What is the longest Surah in the Quran?',
-    options: ['Al-Fatiha', 'Al-Kahf', 'Al-Imran', 'Al-Baqarah'],
-    answer: 3,
-  },
-  {
-    question: 'Which angel is responsible for blowing the trumpet on the Day of Judgment?',
-    options: ['Jibril', 'Mikail', 'Israfil', 'Izrail'],
-    answer: 2,
-  },
-  {
-    question: 'How many years did it take for the Quran to be revealed?',
-    options: ['10', '23', '40', '15'],
-    answer: 1,
-  },
-];
+import React, { useState, useEffect } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, ActivityIndicator } from 'react-native';
+import { generateQuizQuestions, QuizQuestion } from '../../services/aiService';
 
 export default function QuizScreen() {
+  const [questions, setQuestions] = useState<QuizQuestion[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [score, setScore] = useState(0);
   const [showResult, setShowResult] = useState(false);
   const [selectedOption, setSelectedOption] = useState<number | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  const fetchQuestions = async () => {
+    setLoading(true);
+    setShowResult(false);
+    setCurrentIndex(0);
+    setScore(0);
+    setSelectedOption(null);
+    
+    // Generate 5 new questions using Gemini AI
+    const generated = await generateQuizQuestions(5);
+    setQuestions(generated);
+    setLoading(false);
+  };
+
+  // Fetch questions on mount
+  useEffect(() => {
+    fetchQuestions();
+  }, []);
 
   const handleSelect = (index: number) => {
     if (selectedOption !== null) return;
     setSelectedOption(index);
-    if (index === QUIZ_QUESTIONS[currentIndex].answer) {
+    if (index === questions[currentIndex].answer) {
       setScore(score + 1);
     }
     setTimeout(() => {
-      if (currentIndex < QUIZ_QUESTIONS.length - 1) {
+      if (currentIndex < questions.length - 1) {
         setCurrentIndex(currentIndex + 1);
         setSelectedOption(null);
       } else {
         setShowResult(true);
       }
-    }, 1000);
+    }, 1500); // 1.5 seconds delay so they can read the right answer
   };
 
-  const restartQuiz = () => {
-    setCurrentIndex(0);
-    setScore(0);
-    setShowResult(false);
-    setSelectedOption(null);
-  };
+  if (loading) {
+    return (
+      <View style={styles.centered}>
+        <ActivityIndicator size="large" color="#D4AF37" />
+        <Text style={styles.loadingText}>Gemini AI is generating new questions...</Text>
+      </View>
+    );
+  }
 
-  if (showResult) {
+  if (showResult || questions.length === 0) {
     return (
       <View style={styles.centered}>
         <Text style={styles.resultTitle}>Quiz Completed!</Text>
-        <Text style={styles.scoreText}>Your Score: {score} / {QUIZ_QUESTIONS.length}</Text>
-        <TouchableOpacity style={styles.button} onPress={restartQuiz}>
-          <Text style={styles.buttonText}>Try Again</Text>
+        <Text style={styles.scoreText}>Your Score: {score} / {questions.length}</Text>
+        <TouchableOpacity style={styles.button} onPress={fetchQuestions}>
+          <Text style={styles.buttonText}>Generate New Quiz</Text>
         </TouchableOpacity>
       </View>
     );
   }
 
-  const q = QUIZ_QUESTIONS[currentIndex];
+  const q = questions[currentIndex];
 
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
-      <Text style={styles.progress}>Question {currentIndex + 1} of {QUIZ_QUESTIONS.length}</Text>
+      <Text style={styles.aiBadge}>✨ Powered by Gemini AI</Text>
+      <Text style={styles.progress}>Question {currentIndex + 1} of {questions.length}</Text>
       <Text style={styles.question}>{q.question}</Text>
 
       {q.options.map((opt, idx) => {
@@ -111,6 +107,8 @@ const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#0F2F20' },
   content: { padding: 20 },
   centered: { flex: 1, justifyContent: 'center', alignItems: 'center', padding: 20, backgroundColor: '#0F2F20' },
+  loadingText: { color: '#D4AF37', marginTop: 16, fontWeight: '600' },
+  aiBadge: { color: '#A0A0A0', fontSize: 12, textAlign: 'center', marginBottom: 10, fontStyle: 'italic' },
   progress: { color: '#D4AF37', fontSize: 14, fontWeight: '600', marginBottom: 20, textAlign: 'center' },
   question: { color: '#FFF', fontSize: 22, fontWeight: 'bold', marginBottom: 30, textAlign: 'center', lineHeight: 32 },
   option: {

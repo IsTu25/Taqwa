@@ -130,3 +130,68 @@ export const evaluateDeedWithGemini = async (userDeed: string): Promise<DeedEval
     };
   }
 };
+
+export interface QuizQuestion {
+  question: string;
+  options: string[];
+  answer: number;
+}
+
+export const generateQuizQuestions = async (count: number = 5): Promise<QuizQuestion[]> => {
+  if (!GEMINI_API_KEY) {
+    // Fallback if no API key
+    return [
+      {
+        question: 'Please add your Gemini API Key in .env to enable AI Quiz Generation.',
+        options: ['Ok', 'Will do', 'Understood', 'Got it'],
+        answer: 0,
+      }
+    ];
+  }
+
+  try {
+    const prompt = `
+      You are an Islamic scholar and quiz master. Generate ${count} random, engaging, and accurate multiple-choice questions about Islam (Quran, Seerah, Prophets, Fiqh, Islamic History).
+      Each question must have exactly 4 options.
+      The 'answer' field must be the 0-indexed integer of the correct option (0, 1, 2, or 3).
+      
+      You must respond strictly in JSON format as an array of objects, without any markdown wrappers or code blocks.
+      Example format:
+      [
+        {
+          "question": "How many Surahs are in the Quran?",
+          "options": ["112", "114", "120", "100"],
+          "answer": 1
+        }
+      ]
+    `;
+
+    const response = await axios.post(
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY}`,
+      {
+        contents: [{ parts: [{ text: prompt }] }],
+        generationConfig: {
+          responseMimeType: "application/json",
+        }
+      },
+      {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      }
+    );
+
+    const textResult = response.data.candidates[0].content.parts[0].text;
+    const parsed = JSON.parse(textResult);
+    return parsed as QuizQuestion[];
+  } catch (error) {
+    console.error("Gemini AI Quiz Error:", error);
+    return [
+      {
+        question: 'Failed to generate questions. Please check your internet or API key.',
+        options: ['Try Again', 'Retry', 'Cancel', 'Exit'],
+        answer: 0,
+      }
+    ];
+  }
+};

@@ -4,6 +4,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Moon, Bell, Sun, Sunrise, Sunset } from 'lucide-react-native';
 import { getCoords, fetchPrayerTimes, getActivePrayer, getNextPrayer, PrayerTimeEntry } from '../../services/prayerService';
 import { scheduleAzanNotifications } from '../../services/notificationService';
+import AnalogClock from '../../components/AnalogClock';
 
 const PRAYER_ICONS: Record<string, any> = {
   Fajr: Sunrise,
@@ -72,7 +73,7 @@ export default function Home() {
         </View>
 
         <View style={styles.clockContainer}>
-          <Text style={styles.clockText}>{formatTime(currentTime)}</Text>
+          <AnalogClock size={160} />
           {nextPrayer && (
             <Text style={styles.nextPrayerText}>
               {nextPrayer.name} in {Math.max(nextPrayer.minutesLeft, 0)} min
@@ -93,7 +94,7 @@ export default function Home() {
 
                 return (
                   <View key={prayer.name} style={[styles.prayerCard, isActive && styles.activePrayerCard]}>
-                    <Icon color={isActive ? '#D4AF37' : '#FFFFFF'} size={32} />
+                    <Icon color={isActive ? '#D4AF37' : '#FFFFFF'} size={24} />
                     <Text style={[styles.prayerName, isActive && styles.activeText]}>{prayer.name}</Text>
                     <Text style={[styles.prayerTime, isActive && styles.activeText]}>{prayer.time}</Text>
                   </View>
@@ -120,12 +121,12 @@ const styles = StyleSheet.create({
   prayerCardsContainer: { paddingHorizontal: 20 },
   grid: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between' },
   prayerCard: {
-    width: '48%', backgroundColor: '#1B4332', padding: 20, borderRadius: 16,
-    alignItems: 'center', marginBottom: 15,
+    width: '31%', backgroundColor: '#1B4332', padding: 12, borderRadius: 12,
+    alignItems: 'center', marginBottom: 12,
   },
   activePrayerCard: { backgroundColor: '#1B4332', borderColor: '#D4AF37', borderWidth: 2 },
-  prayerName: { color: '#FFFFFF', fontSize: 18, fontWeight: '600', marginTop: 10 },
-  prayerTime: { color: '#A0A0A0', fontSize: 14, marginTop: 5 },
+  prayerName: { color: '#FFFFFF', fontSize: 14, fontWeight: '600', marginTop: 8 },
+  prayerTime: { color: '#A0A0A0', fontSize: 12, marginTop: 4 },
   activeText: { color: '#D4AF37' },
   errorText: { color: '#FF4444', textAlign: 'center', marginTop: 20 },
 });
