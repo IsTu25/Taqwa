@@ -39,6 +39,37 @@ export const getDailyAISuggestion = async (score: number) => {
   }
 };
 
+export const askMasailBot = async (question: string): Promise<string> => {
+  if (!GEMINI_API_KEY) {
+    return 'Please add your Gemini API Key in .env to enable the Masail chatbot.';
+  }
+
+  try {
+    const prompt = `
+      You are "Masail", a knowledgeable and humble Islamic assistant embedded in the Takwa app.
+      Answer the user's everyday Fiqh / Islamic question below, in whichever language they asked
+      in (English or Bangla). Keep the answer concise (3-6 sentences), practical, and where
+      relevant mention that different schools of thought (madhahib) may differ and recommend
+      consulting a local scholar for rulings with significant personal consequences.
+      Do not fabricate Quran verse numbers or Hadith references you are not confident about;
+      speak in general terms if unsure.
+
+      Question: "${question}"
+    `;
+
+    const response = await axios.post(
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY}`,
+      { contents: [{ parts: [{ text: prompt }] }] },
+      { headers: { 'Content-Type': 'application/json' } }
+    );
+
+    return response.data.candidates[0].content.parts[0].text.trim();
+  } catch (error) {
+    console.error('Masail bot error:', error);
+    return "I couldn't reach the AI service right now. Please try again in a moment.";
+  }
+};
+
 export interface DeedEvaluation {
   type: 'good' | 'bad';
   points: number;

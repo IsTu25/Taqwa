@@ -26,10 +26,21 @@ const firebaseConfig = {
 const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApp();
 
 // Web needs getAuth; native needs initializeAuth + AsyncStorage persistence
-export const auth =
-  Platform.OS === 'web'
-    ? getAuth(app)
-    : initializeAuth(app, { persistence: getReactNativePersistence(AsyncStorage) });
+let authInstance;
+if (Platform.OS === 'web') {
+  authInstance = getAuth(app);
+} else {
+  try {
+    authInstance = initializeAuth(app, { persistence: getReactNativePersistence(AsyncStorage) });
+  } catch (error: any) {
+    if (error.code === 'auth/already-initialized') {
+      authInstance = getAuth(app);
+    } else {
+      throw error;
+    }
+  }
+}
+export const auth = authInstance;
 
 export const db = getFirestore(app);
 

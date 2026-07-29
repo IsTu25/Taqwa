@@ -5,7 +5,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from '../../store/store';
 import { addDeed, addSin, setScore } from '../../store/taqwaSlice';
 import { Check, AlertTriangle, Book } from 'lucide-react-native';
-import LottieView from 'lottie-react-native';
+import AmbientGlow from '../../components/AmbientGlow';
 import { getDailyAISuggestion, evaluateDeedWithGemini } from '../../services/aiService';
 import { syncScoreToFirestore, fetchTodayScoreFromFirestore } from '../../services/dbService';
 import { auth } from '../../services/firebase';
@@ -89,16 +89,8 @@ export default function Taqwa() {
   return (
     <ImageBackground source={require('../../../assets/images/3rd  page.png')} style={styles.backgroundImage}>
       <SafeAreaView style={[styles.container, isPositive ? styles.positiveBg : styles.negativeBg]}>
-      {/* Background Lottie Animation */}
-      <View style={StyleSheet.absoluteFill} pointerEvents="none">
-        <LottieView
-          source={isPositive ? require('../../../assets/garden.json') : require('../../../assets/fire.json')}
-          autoPlay
-          loop
-          style={styles.lottieBackground}
-          resizeMode="cover"
-        />
-      </View>
+      {/* Ambient background glow (Jannat = green, Istighfar = red/orange) */}
+      <AmbientGlow mode={isPositive ? 'positive' : 'negative'} />
 
       <ScrollView contentContainerStyle={styles.scrollContent}>
         
@@ -214,11 +206,6 @@ const styles = StyleSheet.create({
   },
   negativeBg: {
     backgroundColor: 'rgba(48, 0, 0, 0.5)',
-  },
-  lottieBackground: {
-    width: '100%',
-    height: '100%',
-    opacity: 0.3, // Semi-transparent so text is readable
   },
   scrollContent: {
     padding: 20,
