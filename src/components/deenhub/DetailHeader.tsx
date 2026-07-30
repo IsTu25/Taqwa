@@ -7,7 +7,7 @@ export default function DetailHeader({ title }: { title: string }) {
   const router = useRouter();
   return (
     <View style={styles.row}>
-      <TouchableOpacity onPress={() => router.back()} style={styles.backBtn}>
+      <TouchableOpacity onPress={() => router.navigate('/deen-hub')} style={styles.backBtn}>
         <ChevronLeft color="#D4AF37" size={26} />
       </TouchableOpacity>
       <Text style={styles.title}>{title}</Text>

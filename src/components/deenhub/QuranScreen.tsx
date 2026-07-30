@@ -27,7 +27,7 @@ export default function QuranScreen() {
 
   useEffect(() => {
     axios
-      .get('https://api.alquran.cloud/v1/surah')
+      .get(`${process.env.EXPO_PUBLIC_ALQURAN_CLOUD_API_URL}/surah`)
       .then((res) => setSurahs(res.data.data))
       .catch(() => setError('Could not load the Surah list. Check your connection.'))
       .finally(() => setLoading(false));
@@ -38,8 +38,8 @@ export default function QuranScreen() {
     setLoadingAyahs(true);
     try {
       const [arabicRes, translationRes] = await Promise.all([
-        axios.get(`https://api.alquran.cloud/v1/surah/${surah.number}`),
-        axios.get(`https://api.alquran.cloud/v1/surah/${surah.number}/en.asad`),
+        axios.get(`${process.env.EXPO_PUBLIC_ALQURAN_CLOUD_API_URL}/surah/${surah.number}`),
+        axios.get(`${process.env.EXPO_PUBLIC_ALQURAN_CLOUD_API_URL}/surah/${surah.number}/en.asad`),
       ]);
       const arabicAyahs = arabicRes.data.data.ayahs;
       const translationAyahs = translationRes.data.data.ayahs;

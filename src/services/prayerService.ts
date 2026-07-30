@@ -46,7 +46,7 @@ export const fetchPrayerTimes = async (
   longitude: number
 ): Promise<PrayerTimeEntry[]> => {
   const response = await axios.get(
-    `https://api.aladhan.com/v1/timings?latitude=${latitude}&longitude=${longitude}&method=2`
+    `${process.env.EXPO_PUBLIC_ALADHAN_API_URL}/timings?latitude=${latitude}&longitude=${longitude}&method=2`
   );
   const timings = response.data.data.timings;
   const now = new Date();

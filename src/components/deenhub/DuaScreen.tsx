@@ -23,7 +23,7 @@ export default function DuaScreen() {
   useEffect(() => {
     const fetchDuas = async () => {
       try {
-        const response = await axios.get('https://raw.githubusercontent.com/wafaaelmaandy/Hisn-Muslim-Json/master/husn_en.json');
+        const response = await axios.get(`${process.env.EXPO_PUBLIC_DUA_API_URL}/husn_en.json`);
         if (response.data && response.data.English) {
           setCategories(response.data.English);
         }

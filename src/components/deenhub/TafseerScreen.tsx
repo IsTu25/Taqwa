@@ -30,7 +30,7 @@ export default function TafseerScreen() {
   useEffect(() => {
     const fetchChapters = async () => {
       try {
-        const response = await axios.get('https://api.quran.com/api/v4/chapters');
+        const response = await axios.get(`${process.env.EXPO_PUBLIC_QURAN_API_URL}/chapters`);
         setChapters(response.data.chapters);
       } catch (err) {
         console.log(err);
@@ -46,7 +46,7 @@ export default function TafseerScreen() {
     setTafsirData([]);
     try {
       // 169 is Ibn Kathir (English) in Quran.com API
-      const response = await axios.get(`https://api.quran.com/api/v4/tafsirs/169/by_chapter/${chapterId}`);
+      const response = await axios.get(`${process.env.EXPO_PUBLIC_QURAN_API_URL}/tafsirs/169/by_chapter/${chapterId}`);
       if (response.data && response.data.tafsirs) {
         setTafsirData(response.data.tafsirs);
       }

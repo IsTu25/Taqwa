@@ -56,28 +56,23 @@ export default function AnalogClock({ size = 180 }: AnalogClockProps) {
             }}
           />
         </View>
-        <View style={{ flex: 1 }} /> {/* Transparent bottom half */}
+        <View style={{ flex: 1 }} />
+        {/* Transparent bottom half */}
       </View>
     );
   };
 
   return (
     <View style={[styles.clockContainer, { width: size, height: size, borderRadius: radius }]}>
-      {/* Clock Face Dots */}
       <View style={[styles.dot, styles.dot12]} />
       <View style={[styles.dot, styles.dot3]} />
       <View style={[styles.dot, styles.dot6]} />
       <View style={[styles.dot, styles.dot9]} />
 
-      {/* Hands */}
-      {/* Hour Hand */}
       {renderHand(hrRotation, 6, '#D4AF37', 0.5)}
-      {/* Minute Hand */}
       {renderHand(minRotation, 4, '#FFFFFF', 0.7)}
-      {/* Second Hand */}
       {renderHand(secRotation, 2, '#E74C3C', 0.85)}
 
-      {/* Center Pin */}
       <View style={styles.centerPin} />
     </View>
   );

@@ -29,7 +29,7 @@ export default function HadithScreen() {
   useEffect(() => {
     const fetchSections = async () => {
       try {
-        const response = await axios.get('https://cdn.jsdelivr.net/gh/fawazahmed0/hadith-api@1/info.json');
+        const response = await axios.get(`${process.env.EXPO_PUBLIC_HADITH_API_URL}/info.json`);
         if (response.data && response.data.bukhari && response.data.bukhari.metadata.sections) {
           const sectionsObj = response.data.bukhari.metadata.sections;
           const sectionsList: Section[] = Object.keys(sectionsObj)
@@ -57,7 +57,7 @@ export default function HadithScreen() {
     setError('');
     
     try {
-      const response = await axios.get(`https://cdn.jsdelivr.net/gh/fawazahmed0/hadith-api@1/editions/eng-bukhari/sections/${section.id}.json`);
+      const response = await axios.get(`${process.env.EXPO_PUBLIC_HADITH_API_URL}/editions/eng-bukhari/sections/${section.id}.json`);
       if (response.data && response.data.hadiths) {
         setHadiths(response.data.hadiths);
       }

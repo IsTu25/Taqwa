@@ -84,15 +84,45 @@ src/
       login.tsx
       signup.tsx
     (tabs)/
+      deen-hub/
+        [slug].tsx
+        index.tsx
       _layout.tsx
-      deen-hub.tsx
       index.tsx
       taqwa.tsx
     _layout.tsx
+  components/
+    deenhub/
+      ArticlesScreen.tsx
+      BayanScreen.tsx
+      BooksScreen.tsx
+      DetailHeader.tsx
+      DuaScreen.tsx
+      HadithScreen.tsx
+      HajjUmrahScreen.tsx
+      MasailScreen.tsx
+      NamazGuideScreen.tsx
+      PlaceholderScreen.tsx
+      PrayerTimesScreen.tsx
+      QiblaScreen.tsx
+      QuizScreen.tsx
+      QuranLearningScreen.tsx
+      QuranScreen.tsx
+      RozaScreen.tsx
+      TafseerScreen.tsx
+      TasbihScreen.tsx
+      ZakatScreen.tsx
+    AmbientGlow.tsx
+    AnalogClock.tsx
+  config/
+    deenHubFeatures.ts
+    islamicContent.ts
   services/
     aiService.ts
     dbService.ts
     firebase.ts
+    notificationService.ts
+    prayerService.ts
   store/
     authSlice.ts
     store.ts
@@ -550,45 +580,2299 @@ const styles = StyleSheet.create({
 });
 </file>
 
-<file path="src/services/dbService.ts">
-import { doc, setDoc, getDoc } from 'firebase/firestore';
-import { db, auth } from './firebase';
+<file path="src/app/(tabs)/deen-hub/[slug].tsx">
+import React from 'react';
+import { View, StyleSheet } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { useLocalSearchParams } from 'expo-router';
+import { getFeatureBySlug } from '../../../config/deenHubFeatures';
+import DetailHeader from '../../../components/deenhub/DetailHeader';
+import TasbihScreen from '../../../components/deenhub/TasbihScreen';
+import QiblaScreen from '../../../components/deenhub/QiblaScreen';
+import ZakatScreen from '../../../components/deenhub/ZakatScreen';
+import DuaScreen from '../../../components/deenhub/DuaScreen';
+import HadithScreen from '../../../components/deenhub/HadithScreen';
+import NamazGuideScreen from '../../../components/deenhub/NamazGuideScreen';
+import MasailScreen from '../../../components/deenhub/MasailScreen';
+import QuranScreen from '../../../components/deenhub/QuranScreen';
+import PrayerTimesScreen from '../../../components/deenhub/PrayerTimesScreen';
+import PlaceholderScreen from '../../../components/deenhub/PlaceholderScreen';
+import BayanScreen from '../../../components/deenhub/BayanScreen';
+import QuizScreen from '../../../components/deenhub/QuizScreen';
+import BooksScreen from '../../../components/deenhub/BooksScreen';
+import RozaScreen from '../../../components/deenhub/RozaScreen';
+import QuranLearningScreen from '../../../components/deenhub/QuranLearningScreen';
+import HajjUmrahScreen from '../../../components/deenhub/HajjUmrahScreen';
+import ArticlesScreen from '../../../components/deenhub/ArticlesScreen';
+import TafseerScreen from '../../../components/deenhub/TafseerScreen';
+export default function DeenHubDetail() {
+  const { slug } = useLocalSearchParams<{ slug: string }>();
+  const feature = getFeatureBySlug(slug);
 
-export const syncScoreToFirestore = async (score: number) => {
-  if (!auth.currentUser) return;
+  if (!feature) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <PlaceholderScreen name="Not Found" description="This feature doesn't exist." />
+      </SafeAreaView>
+    );
+  }
+
+  const renderBody = () => {
+    switch (feature.type) {
+      case 'tasbih':
+        return <TasbihScreen />;
+      case 'qibla':
+        return <QiblaScreen />;
+      case 'zakat':
+        return <ZakatScreen />;
+      case 'dua':
+        return <DuaScreen />;
+      case 'hadith':
+        return <HadithScreen />;
+      case 'namazguide':
+        return <NamazGuideScreen />;
+      case 'masail':
+        return <MasailScreen />;
+      case 'quran':
+        return <QuranScreen />;
+      case 'prayertimes':
+        return <PrayerTimesScreen />;
+      case 'bayan':
+        return <BayanScreen />;
+      case 'quiz':
+        return <QuizScreen />;
+      case 'books':
+        return <BooksScreen />;
+      case 'roza':
+        return <RozaScreen />;
+      case 'quranlearning':
+        return <QuranLearningScreen />;
+      case 'hajjumrah':
+        return <HajjUmrahScreen />;
+      case 'articles':
+        return <ArticlesScreen />;
+      case 'tafseer':
+        return <TafseerScreen />;
+      default:
+        return <PlaceholderScreen name={feature.name} description={feature.description} />;
+    }
+  };
+
+  return (
+    <SafeAreaView style={styles.container} edges={['top', 'left', 'right']}>
+      <DetailHeader title={feature.name} />
+      <View style={styles.body}>{renderBody()}</View>
+    </SafeAreaView>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: { flex: 1, backgroundColor: '#0F2F20' },
+  body: { flex: 1 },
+});
+</file>
+
+<file path="src/app/(tabs)/deen-hub/index.tsx">
+import React from 'react';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, ImageBackground } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { useRouter } from 'expo-router';
+import { DEEN_HUB_FEATURES } from '../../../config/deenHubFeatures';
+
+export default function DeenHub() {
+  const router = useRouter();
+
+  return (
+    <ImageBackground source={require('../../../../assets/images/2nd page.png')} style={styles.backgroundImage}>
+      <SafeAreaView style={styles.container}>
+        <Text style={styles.header}>Deen Hub</Text>
+        <ScrollView contentContainerStyle={styles.scrollContent}>
+          <View style={styles.grid}>
+            {DEEN_HUB_FEATURES.map((feature) => {
+              const Icon = feature.icon;
+              return (
+                <TouchableOpacity
+                  key={feature.slug}
+                  style={styles.card}
+                  onPress={() => router.push(`/(tabs)/deen-hub/${feature.slug}` as any)}
+                >
+                  <Icon color="#D4AF37" size={32} />
+                  <Text style={styles.cardText} numberOfLines={2}>
+                    {feature.name}
+                  </Text>
+                </TouchableOpacity>
+              );
+            })}
+          </View>
+        </ScrollView>
+      </SafeAreaView>
+    </ImageBackground>
+  );
+}
+
+const styles = StyleSheet.create({
+  backgroundImage: { flex: 1, resizeMode: 'cover' },
+  container: { flex: 1, backgroundColor: 'transparent' },
+  header: {
+    color: '#D4AF37', fontSize: 26, fontWeight: 'bold',
+    paddingHorizontal: 20, paddingTop: 20,
+  },
+  scrollContent: { padding: 15, marginTop: 10 },
+  grid: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between' },
+  card: {
+    width: '23%',
+    aspectRatio: 0.8,
+    backgroundColor: '#1B4332',
+    borderRadius: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 15,
+    padding: 10,
+    borderWidth: 1,
+    borderColor: 'rgba(212, 175, 55, 0.3)',
+  },
+  cardText: { color: '#D4AF37', fontSize: 12, marginTop: 8, textAlign: 'center' },
+});
+</file>
+
+<file path="src/components/deenhub/BayanScreen.tsx">
+import React from 'react';
+import { View, Text, StyleSheet, FlatList, TouchableOpacity, Linking, Image } from 'react-native';
+import { PlayCircle } from 'lucide-react-native';
+
+interface BayanVideo {
+  id: string;
+  title: string;
+  scholar: string;
+  duration: string;
+  thumbnail: string;
+  url: string;
+}
+
+const VIDEOS: BayanVideo[] = [
+  {
+    id: '1',
+    title: 'Finding Peace in Difficult Times',
+    scholar: 'Mufti Menk',
+    duration: '15:20',
+    thumbnail: 'https://img.youtube.com/vi/d_r8qG2aJpE/mqdefault.jpg',
+    url: 'https://www.youtube.com/watch?v=d_r8qG2aJpE',
+  },
+  {
+    id: '2',
+    title: 'The Beauty of Patience (Sabr)',
+    scholar: 'Omar Suleiman',
+    duration: '12:45',
+    thumbnail: 'https://img.youtube.com/vi/Zf3H-M7U7YI/mqdefault.jpg',
+    url: 'https://www.youtube.com/watch?v=Zf3H-M7U7YI',
+  },
+  {
+    id: '3',
+    title: 'How to Build Consistency in Prayer',
+    scholar: 'Nouman Ali Khan',
+    duration: '22:10',
+    thumbnail: 'https://img.youtube.com/vi/9LqJc_R7X1w/mqdefault.jpg',
+    url: 'https://www.youtube.com/watch?v=9LqJc_R7X1w',
+  },
+];
+
+export default function BayanScreen() {
+  const renderItem = ({ item }: { item: BayanVideo }) => (
+    <TouchableOpacity
+      style={styles.card}
+      activeOpacity={0.8}
+      onPress={() => Linking.openURL(item.url)}
+    >
+      <Image source={{ uri: item.thumbnail }} style={styles.thumbnail} />
+      <View style={styles.overlay}>
+        <PlayCircle color="#FFF" size={40} />
+      </View>
+      <View style={styles.info}>
+        <Text style={styles.title} numberOfLines={2}>{item.title}</Text>
+        <View style={styles.metaRow}>
+          <Text style={styles.scholar}>{item.scholar}</Text>
+          <Text style={styles.duration}>{item.duration}</Text>
+        </View>
+      </View>
+    </TouchableOpacity>
+  );
+
+  return (
+    <View style={styles.container}>
+      <Text style={styles.headerText}>Curated Reminders</Text>
+      <FlatList
+        data={VIDEOS}
+        keyExtractor={(item) => item.id}
+        renderItem={renderItem}
+        contentContainerStyle={styles.listContent}
+        showsVerticalScrollIndicator={false}
+      />
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: { flex: 1, backgroundColor: '#0F2F20' },
+  headerText: { color: '#D4AF37', fontSize: 18, fontWeight: '600', padding: 20, paddingBottom: 10 },
+  listContent: { padding: 20, paddingTop: 0 },
+  card: {
+    backgroundColor: '#1B4332',
+    borderRadius: 16,
+    marginBottom: 20,
+    overflow: 'hidden',
+    borderWidth: 1,
+    borderColor: 'rgba(212, 175, 55, 0.1)',
+  },
+  thumbnail: { width: '100%', height: 180 },
+  overlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(0,0,0,0.3)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    height: 180,
+  },
+  info: { padding: 16 },
+  title: { color: '#FFF', fontSize: 16, fontWeight: 'bold', marginBottom: 8 },
+  metaRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
+  scholar: { color: '#D4AF37', fontSize: 14, fontWeight: '500' },
+  duration: { color: '#A0A0A0', fontSize: 12 },
+});
+</file>
+
+<file path="src/components/deenhub/BooksScreen.tsx">
+import React from 'react';
+import { View, Text, StyleSheet, FlatList, TouchableOpacity, Linking } from 'react-native';
+import { BookMarked } from 'lucide-react-native';
+
+interface BookItem {
+  id: string;
+  title: string;
+  author: string;
+  description: string;
+  url: string;
+}
+
+const BOOKS: BookItem[] = [
+  {
+    id: '1',
+    title: 'The Sealed Nectar (Ar-Raheeq Al-Makhtum)',
+    author: 'Safiur Rahman Mubarakpuri',
+    description: 'A complete authoritative book on the life of Prophet Muhammad (SAW) which was honored by the World Muslim League as first prize winner.',
+    url: 'https://kalamullah.com/sealed-nectar.html',
+  },
+  {
+    id: '2',
+    title: 'Riyad as-Salihin (The Meadows of the Righteous)',
+    author: 'Imam Nawawi',
+    description: 'A highly acclaimed compilation of verses from the Qur\'an and Hadith by Imam an-Nawawi, covering various aspects of Islamic morals and etiquette.',
+    url: 'https://sunnah.com/riyadussalihin',
+  },
+  {
+    id: '3',
+    title: 'Fortress of the Muslim (Hisnul Muslim)',
+    author: 'Sa\'id bin Ali bin Wahf Al-Qahtani',
+    description: 'A widely popular collection of authentic invocations and supplications (Du\'as) for daily use from the Quran and Sunnah.',
+    url: 'https://sunnah.com/hisn',
+  },
+];
+
+export default function BooksScreen() {
+  const renderItem = ({ item }: { item: BookItem }) => (
+    <TouchableOpacity
+      style={styles.card}
+      activeOpacity={0.8}
+      onPress={() => Linking.openURL(item.url)}
+    >
+      <View style={styles.iconContainer}>
+        <BookMarked color="#D4AF37" size={32} />
+      </View>
+      <View style={styles.info}>
+        <Text style={styles.title}>{item.title}</Text>
+        <Text style={styles.author}>by {item.author}</Text>
+        <Text style={styles.description} numberOfLines={3}>{item.description}</Text>
+      </View>
+    </TouchableOpacity>
+  );
+
+  return (
+    <View style={styles.container}>
+      <FlatList
+        data={BOOKS}
+        keyExtractor={(item) => item.id}
+        renderItem={renderItem}
+        contentContainerStyle={styles.listContent}
+        showsVerticalScrollIndicator={false}
+      />
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: { flex: 1, backgroundColor: '#0F2F20' },
+  listContent: { padding: 20 },
+  card: {
+    backgroundColor: '#1B4332',
+    borderRadius: 16,
+    padding: 20,
+    marginBottom: 16,
+    borderWidth: 1,
+    borderColor: 'rgba(212, 175, 55, 0.15)',
+    flexDirection: 'row',
+  },
+  iconContainer: {
+    width: 60,
+    height: 80,
+    backgroundColor: 'rgba(212, 175, 55, 0.1)',
+    borderRadius: 8,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 16,
+  },
+  info: { flex: 1, justifyContent: 'center' },
+  title: { color: '#FFF', fontSize: 16, fontWeight: 'bold', marginBottom: 4 },
+  author: { color: '#D4AF37', fontSize: 14, marginBottom: 8, fontStyle: 'italic' },
+  description: { color: '#A0A0A0', fontSize: 12, lineHeight: 18 },
+});
+</file>
+
+<file path="src/components/deenhub/DetailHeader.tsx">
+import React from 'react';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { useRouter } from 'expo-router';
+import { ChevronLeft } from 'lucide-react-native';
+
+export default function DetailHeader({ title }: { title: string }) {
+  const router = useRouter();
+  return (
+    <View style={styles.row}>
+      <TouchableOpacity onPress={() => router.back()} style={styles.backBtn}>
+        <ChevronLeft color="#D4AF37" size={26} />
+      </TouchableOpacity>
+      <Text style={styles.title}>{title}</Text>
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  row: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 12, paddingTop: 16, paddingBottom: 8 },
+  backBtn: { padding: 8 },
+  title: { color: '#D4AF37', fontSize: 22, fontWeight: 'bold', marginLeft: 4 },
+});
+</file>
+
+<file path="src/components/deenhub/DuaScreen.tsx">
+import React, { useState, useEffect } from 'react';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, ActivityIndicator } from 'react-native';
+import axios from 'axios';
+
+interface HisnDua {
+  ID: number;
+  ARABIC_TEXT: string;
+  TRANSLATED_TEXT: string;
+}
+
+interface HisnCategory {
+  ID: number;
+  TITLE: string;
+  TEXT: HisnDua[];
+}
+
+export default function DuaScreen() {
+  const [categories, setCategories] = useState<HisnCategory[]>([]);
+  const [selectedCategory, setSelectedCategory] = useState<HisnCategory | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    const fetchDuas = async () => {
+      try {
+        const response = await axios.get('https://raw.githubusercontent.com/wafaaelmaandy/Hisn-Muslim-Json/master/husn_en.json');
+        if (response.data && response.data.English) {
+          setCategories(response.data.English);
+        }
+      } catch (err) {
+        console.error(err);
+        setError('Failed to load Duas. Please check your connection.');
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchDuas();
+  }, []);
+
+  if (loading) {
+    return (
+      <View style={styles.centerContainer}>
+        <ActivityIndicator size="large" color="#D4AF37" />
+        <Text style={styles.loadingText}>Loading Hisnul Muslim Library...</Text>
+      </View>
+    );
+  }
+
+  if (error) {
+    return (
+      <View style={styles.centerContainer}>
+        <Text style={styles.errorText}>{error}</Text>
+      </View>
+    );
+  }
+
+  if (selectedCategory) {
+    return (
+      <View style={styles.container}>
+        <View style={styles.headerRow}>
+          <TouchableOpacity onPress={() => setSelectedCategory(null)} style={styles.backBtn}>
+            <Text style={styles.backBtnText}>← Back to Categories</Text>
+          </TouchableOpacity>
+        </View>
+        <ScrollView contentContainerStyle={styles.content}>
+          <Text style={styles.categoryTitle}>{selectedCategory.TITLE}</Text>
+          {selectedCategory.TEXT.map((dua, i) => (
+            <View key={dua.ID || i} style={styles.card}>
+              <Text style={styles.arabic}>{dua.ARABIC_TEXT}</Text>
+              <Text style={styles.meaning}>{dua.TRANSLATED_TEXT}</Text>
+            </View>
+          ))}
+        </ScrollView>
+      </View>
+    );
+  }
+
+  return (
+    <ScrollView contentContainerStyle={styles.container}>
+      <Text style={styles.intro}>
+        Explore authentic supplications from the renowned book Hisnul Muslim (Fortress of the Muslim).
+      </Text>
+      {categories.map((cat) => (
+        <TouchableOpacity
+          key={cat.ID}
+          style={styles.categoryCard}
+          activeOpacity={0.7}
+          onPress={() => setSelectedCategory(cat)}
+        >
+          <Text style={styles.categoryName}>{cat.TITLE}</Text>
+          <Text style={styles.categoryCount}>{cat.TEXT?.length || 0} Duas</Text>
+        </TouchableOpacity>
+      ))}
+    </ScrollView>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: { flex: 1, backgroundColor: '#0F2F20', padding: 20 },
+  centerContainer: { flex: 1, backgroundColor: '#0F2F20', alignItems: 'center', justifyContent: 'center', padding: 20 },
+  content: { paddingBottom: 40 },
+  intro: { color: '#A0A0A0', fontSize: 14, lineHeight: 22, fontStyle: 'italic', marginBottom: 20 },
+  loadingText: { color: '#D4AF37', marginTop: 16, fontWeight: '600' },
+  errorText: { color: '#E74C3C', textAlign: 'center', fontSize: 16 },
   
-  const userId = auth.currentUser.uid;
-  const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
+  categoryCard: {
+    backgroundColor: '#1B4332',
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 12,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: 'rgba(212, 175, 55, 0.15)',
+  },
+  categoryName: { color: '#FFF', fontSize: 16, fontWeight: 'bold', flex: 1, marginRight: 10 },
+  categoryCount: { color: '#D4AF37', fontSize: 13, fontWeight: '600' },
+
+  headerRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 20 },
+  backBtn: { backgroundColor: 'rgba(212, 175, 55, 0.1)', paddingHorizontal: 12, paddingVertical: 6, borderRadius: 16 },
+  backBtnText: { color: '#D4AF37', fontWeight: '600', fontSize: 14 },
   
+  categoryTitle: { color: '#D4AF37', fontSize: 20, fontWeight: 'bold', marginBottom: 20, lineHeight: 28 },
+  
+  card: {
+    backgroundColor: '#1B4332', borderRadius: 14, padding: 20, marginBottom: 16,
+    borderWidth: 1, borderColor: 'rgba(212, 175, 55, 0.3)',
+  },
+  arabic: { color: '#FFFFFF', fontSize: 22, textAlign: 'right', marginBottom: 16, lineHeight: 36 },
+  meaning: { color: '#E5E7EB', fontSize: 15, lineHeight: 24 },
+});
+</file>
+
+<file path="src/components/deenhub/HadithScreen.tsx">
+import React, { useState, useEffect } from 'react';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, ActivityIndicator } from 'react-native';
+import axios from 'axios';
+
+interface Hadith {
+  hadithnumber: number;
+  arabicnumber: number;
+  text: string;
+  reference: {
+    book: number;
+    hadith: number;
+  };
+}
+
+interface Section {
+  id: string;
+  name: string;
+}
+
+export default function HadithScreen() {
+  const [sections, setSections] = useState<Section[]>([]);
+  const [selectedSection, setSelectedSection] = useState<Section | null>(null);
+  const [hadiths, setHadiths] = useState<Hadith[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [loadingHadiths, setLoadingHadiths] = useState(false);
+  const [error, setError] = useState('');
+
+  // Fetch Sahih al Bukhari sections on mount
+  useEffect(() => {
+    const fetchSections = async () => {
+      try {
+        const response = await axios.get('https://cdn.jsdelivr.net/gh/fawazahmed0/hadith-api@1/info.json');
+        if (response.data && response.data.bukhari && response.data.bukhari.metadata.sections) {
+          const sectionsObj = response.data.bukhari.metadata.sections;
+          const sectionsList: Section[] = Object.keys(sectionsObj)
+            .filter(key => key !== "0" && sectionsObj[key].trim() !== "") // filter out empty
+            .map(key => ({
+              id: key,
+              name: sectionsObj[key]
+            }));
+          setSections(sectionsList);
+        }
+      } catch (err) {
+        console.error(err);
+        setError('Failed to load chapters. Please check your connection.');
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchSections();
+  }, []);
+
+  const loadHadiths = async (section: Section) => {
+    setSelectedSection(section);
+    setLoadingHadiths(true);
+    setHadiths([]);
+    setError('');
+    
+    try {
+      const response = await axios.get(`https://cdn.jsdelivr.net/gh/fawazahmed0/hadith-api@1/editions/eng-bukhari/sections/${section.id}.json`);
+      if (response.data && response.data.hadiths) {
+        setHadiths(response.data.hadiths);
+      }
+    } catch (err) {
+      console.error(err);
+      setError('Failed to load Hadiths.');
+    } finally {
+      setLoadingHadiths(false);
+    }
+  };
+
+  if (loading) {
+    return (
+      <View style={styles.centerContainer}>
+        <ActivityIndicator size="large" color="#D4AF37" />
+        <Text style={styles.loadingText}>Loading Sahih al-Bukhari Library...</Text>
+      </View>
+    );
+  }
+
+  if (selectedSection) {
+    return (
+      <View style={styles.container}>
+        <View style={styles.headerRow}>
+          <TouchableOpacity onPress={() => setSelectedSection(null)} style={styles.backBtn}>
+            <Text style={styles.backBtnText}>← Back to Chapters</Text>
+          </TouchableOpacity>
+        </View>
+
+        {loadingHadiths ? (
+          <View style={styles.centerContainer}>
+            <ActivityIndicator size="large" color="#D4AF37" />
+            <Text style={styles.loadingText}>Fetching Hadiths...</Text>
+          </View>
+        ) : error ? (
+          <View style={styles.centerContainer}>
+            <Text style={styles.errorText}>{error}</Text>
+          </View>
+        ) : (
+          <ScrollView contentContainerStyle={styles.content}>
+            <Text style={styles.sectionTitle}>{selectedSection.name}</Text>
+            <Text style={styles.sourceText}>Source: Sahih al-Bukhari</Text>
+            
+            {hadiths.map((h, i) => (
+              <View key={h.hadithnumber || i} style={styles.card}>
+                <View style={styles.hadithBadge}>
+                  <Text style={styles.hadithBadgeText}>Hadith {h.hadithnumber}</Text>
+                </View>
+                <Text style={styles.text}>"{h.text}"</Text>
+                <Text style={styles.narrator}>Narrated by various</Text>
+                {h.reference && (
+                  <Text style={styles.reference}>
+                    Book {h.reference.book}, Hadith {h.reference.hadith}
+                  </Text>
+                )}
+              </View>
+            ))}
+          </ScrollView>
+        )}
+      </View>
+    );
+  }
+
+  return (
+    <ScrollView contentContainerStyle={styles.container}>
+      <Text style={styles.intro}>
+        Read thousands of authentic narrations from Sahih al-Bukhari. Select a chapter below to begin.
+      </Text>
+      {error ? (
+        <Text style={styles.errorText}>{error}</Text>
+      ) : (
+        sections.map((section) => (
+          <TouchableOpacity
+            key={section.id}
+            style={styles.chapterCard}
+            activeOpacity={0.7}
+            onPress={() => loadHadiths(section)}
+          >
+            <View style={styles.chapterNumberBox}>
+              <Text style={styles.chapterNumber}>{section.id}</Text>
+            </View>
+            <Text style={styles.chapterName}>{section.name}</Text>
+          </TouchableOpacity>
+        ))
+      )}
+    </ScrollView>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: { flex: 1, backgroundColor: '#0F2F20', padding: 20 },
+  centerContainer: { flex: 1, backgroundColor: '#0F2F20', alignItems: 'center', justifyContent: 'center', padding: 20 },
+  content: { paddingBottom: 40 },
+  intro: { color: '#A0A0A0', fontSize: 14, lineHeight: 22, fontStyle: 'italic', marginBottom: 20 },
+  loadingText: { color: '#D4AF37', marginTop: 16, fontWeight: '600' },
+  errorText: { color: '#E74C3C', textAlign: 'center', fontSize: 16 },
+  
+  chapterCard: {
+    backgroundColor: '#1B4332',
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 12,
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: 'rgba(212, 175, 55, 0.15)',
+  },
+  chapterNumberBox: {
+    width: 40, height: 40, borderRadius: 20, backgroundColor: 'rgba(212, 175, 55, 0.2)',
+    alignItems: 'center', justifyContent: 'center', marginRight: 16
+  },
+  chapterNumber: { color: '#D4AF37', fontWeight: 'bold' },
+  chapterName: { color: '#FFF', fontSize: 16, fontWeight: 'bold', flex: 1 },
+
+  headerRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 20 },
+  backBtn: { backgroundColor: 'rgba(212, 175, 55, 0.1)', paddingHorizontal: 12, paddingVertical: 6, borderRadius: 16 },
+  backBtnText: { color: '#D4AF37', fontWeight: '600', fontSize: 14 },
+  
+  sectionTitle: { color: '#D4AF37', fontSize: 20, fontWeight: 'bold', marginBottom: 6, lineHeight: 28 },
+  sourceText: { color: '#A0A0A0', fontSize: 12, fontStyle: 'italic', marginBottom: 20 },
+
+  card: {
+    backgroundColor: '#1B4332', borderRadius: 14, padding: 20, marginBottom: 16,
+    borderWidth: 1, borderColor: 'rgba(212, 175, 55, 0.3)',
+  },
+  hadithBadge: { alignSelf: 'flex-start', backgroundColor: 'rgba(212, 175, 55, 0.15)', paddingHorizontal: 12, paddingVertical: 6, borderRadius: 12, marginBottom: 16 },
+  hadithBadgeText: { color: '#D4AF37', fontSize: 13, fontWeight: 'bold' },
+  text: { color: '#FFFFFF', fontSize: 15, lineHeight: 24, fontStyle: 'italic', marginBottom: 16 },
+  narrator: { color: '#D4AF37', fontSize: 13, fontWeight: '600', marginBottom: 4 },
+  reference: { color: '#A0A0A0', fontSize: 12, marginTop: 2 },
+});
+</file>
+
+<file path="src/components/deenhub/HajjUmrahScreen.tsx">
+import React, { useState } from 'react';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import { CheckSquare, Square } from 'lucide-react-native';
+
+const UMRAH_STEPS = [
+  { id: '1', title: 'Ihram', desc: 'Perform Ghusl, wear the Ihram garments, and make the intention (Niyyah) for Umrah at the Miqat. Start reciting Talbiyah.' },
+  { id: '2', title: 'Tawaf', desc: 'Circle the Kaaba seven times counter-clockwise, starting from the Black Stone. Pray 2 Rakats at Maqam Ibrahim.' },
+  { id: '3', title: 'Sa\'i', desc: 'Walk seven times between the hills of Safa and Marwah, starting at Safa and ending at Marwah.' },
+  { id: '4', title: 'Halq/Taqsir', desc: 'Men shave their heads (Halq) or trim their hair (Taqsir). Women trim a fingertip\'s length of their hair. Ihram ends.' },
+];
+
+export default function HajjUmrahScreen() {
+  const [completedSteps, setCompletedSteps] = useState<Record<string, boolean>>({});
+
+  const toggleStep = (id: string) => {
+    setCompletedSteps((prev) => ({ ...prev, [id]: !prev[id] }));
+  };
+
+  return (
+    <ScrollView style={styles.container} contentContainerStyle={styles.content}>
+      <Text style={styles.title}>Umrah Step-by-Step</Text>
+      <Text style={styles.subtitle}>Track your Umrah rites and progress.</Text>
+      
+      {UMRAH_STEPS.map((step, index) => {
+        const isDone = completedSteps[step.id];
+        return (
+          <TouchableOpacity 
+            key={step.id} 
+            style={[styles.stepCard, isDone && styles.stepCardDone]}
+            onPress={() => toggleStep(step.id)}
+            activeOpacity={0.8}
+          >
+            <View style={styles.stepHeader}>
+              <View style={styles.numberBadge}>
+                <Text style={styles.numberText}>{index + 1}</Text>
+              </View>
+              <Text style={[styles.stepTitle, isDone && styles.textDone]}>{step.title}</Text>
+              <View style={{ flex: 1 }} />
+              {isDone ? <CheckSquare color="#D4AF37" size={24} /> : <Square color="#555" size={24} />}
+            </View>
+            <Text style={[styles.stepDesc, isDone && styles.textDone]}>{step.desc}</Text>
+          </TouchableOpacity>
+        );
+      })}
+    </ScrollView>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: { flex: 1, backgroundColor: '#0F2F20' },
+  content: { padding: 20 },
+  title: { color: '#D4AF37', fontSize: 24, fontWeight: 'bold', marginBottom: 4 },
+  subtitle: { color: '#A0A0A0', fontSize: 14, marginBottom: 24 },
+  stepCard: {
+    backgroundColor: '#1B4332',
+    borderRadius: 16,
+    padding: 16,
+    marginBottom: 16,
+    borderWidth: 1,
+    borderColor: 'rgba(212, 175, 55, 0.2)',
+  },
+  stepCardDone: { opacity: 0.6, borderColor: 'transparent' },
+  stepHeader: { flexDirection: 'row', alignItems: 'center', marginBottom: 12 },
+  numberBadge: { width: 28, height: 28, borderRadius: 14, backgroundColor: 'rgba(212, 175, 55, 0.2)', alignItems: 'center', justifyContent: 'center', marginRight: 12 },
+  numberText: { color: '#D4AF37', fontSize: 14, fontWeight: 'bold' },
+  stepTitle: { color: '#FFF', fontSize: 18, fontWeight: 'bold' },
+  stepDesc: { color: '#FFF', fontSize: 14, lineHeight: 22, paddingLeft: 40 },
+  textDone: { color: '#A0A0A0', textDecorationLine: 'line-through' },
+});
+</file>
+
+<file path="src/components/deenhub/MasailScreen.tsx">
+import React, { useState, useRef } from 'react';
+import {
+  View, Text, StyleSheet, TextInput, TouchableOpacity, ScrollView,
+  ActivityIndicator, KeyboardAvoidingView, Platform,
+} from 'react-native';
+import { Send } from 'lucide-react-native';
+import { askMasailBot } from '../../services/aiService';
+
+interface Message {
+  role: 'user' | 'bot';
+  text: string;
+}
+
+export default function MasailScreen() {
+  const [messages, setMessages] = useState<Message[]>([
+    { role: 'bot', text: 'Assalamu Alaikum! Ask me any everyday Fiqh question, in English or Bangla.' },
+  ]);
+  const [input, setInput] = useState('');
+  const [loading, setLoading] = useState(false);
+  const scrollRef = useRef<ScrollView>(null);
+
+  const send = async () => {
+    if (!input.trim() || loading) return;
+    const question = input.trim();
+    setMessages((m) => [...m, { role: 'user', text: question }]);
+    setInput('');
+    setLoading(true);
+
+    const answer = await askMasailBot(question);
+    setMessages((m) => [...m, { role: 'bot', text: answer }]);
+    setLoading(false);
+    setTimeout(() => scrollRef.current?.scrollToEnd({ animated: true }), 100);
+  };
+
+  return (
+    <KeyboardAvoidingView
+      style={styles.flex}
+      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+      keyboardVerticalOffset={90}
+    >
+      <ScrollView ref={scrollRef} contentContainerStyle={styles.messages}>
+        {messages.map((m, i) => (
+          <View key={i} style={[styles.bubble, m.role === 'user' ? styles.userBubble : styles.botBubble]}>
+            <Text style={[styles.bubbleText, m.role === 'user' && styles.userBubbleText]}>{m.text}</Text>
+          </View>
+        ))}
+        {loading && <ActivityIndicator color="#D4AF37" style={{ marginTop: 8 }} />}
+      </ScrollView>
+
+      <View style={styles.inputRow}>
+        <TextInput
+          style={styles.input}
+          value={input}
+          onChangeText={setInput}
+          placeholder="Ask a Fiqh question..."
+          placeholderTextColor="#A0A0A0"
+          onSubmitEditing={send}
+        />
+        <TouchableOpacity style={styles.sendBtn} onPress={send} disabled={loading}>
+          <Send color="#0F2F20" size={20} />
+        </TouchableOpacity>
+      </View>
+    </KeyboardAvoidingView>
+  );
+}
+
+const styles = StyleSheet.create({
+  flex: { flex: 1 },
+  messages: { padding: 16, paddingBottom: 24 },
+  bubble: { maxWidth: '85%', borderRadius: 14, padding: 12, marginBottom: 10 },
+  userBubble: { backgroundColor: '#D4AF37', alignSelf: 'flex-end' },
+  botBubble: { backgroundColor: '#1B4332', alignSelf: 'flex-start', borderWidth: 1, borderColor: 'rgba(212, 175, 55, 0.3)' },
+  bubbleText: { color: '#FFFFFF', fontSize: 14, lineHeight: 20 },
+  userBubbleText: { color: '#0F2F20' },
+  inputRow: {
+    flexDirection: 'row', padding: 12, alignItems: 'center',
+    borderTopWidth: 1, borderTopColor: 'rgba(212, 175, 55, 0.2)',
+  },
+  input: {
+    flex: 1, backgroundColor: '#1B4332', color: '#FFFFFF', borderRadius: 20,
+    paddingHorizontal: 16, paddingVertical: 10, marginRight: 10,
+  },
+  sendBtn: {
+    width: 44, height: 44, borderRadius: 22, backgroundColor: '#D4AF37',
+    alignItems: 'center', justifyContent: 'center',
+  },
+});
+</file>
+
+<file path="src/components/deenhub/NamazGuideScreen.tsx">
+import React from 'react';
+import { View, Text, StyleSheet, ScrollView } from 'react-native';
+import { NAMAZ_GUIDE } from '../../config/islamicContent';
+
+export default function NamazGuideScreen() {
+  return (
+    <ScrollView contentContainerStyle={styles.container}>
+      {NAMAZ_GUIDE.map((section, i) => (
+        <View key={i} style={styles.card}>
+          <Text style={styles.sectionTitle}>{section.title}</Text>
+          {section.steps.map((step, j) => (
+            <View key={j} style={styles.stepRow}>
+              <View style={styles.stepNumber}>
+                <Text style={styles.stepNumberText}>{j + 1}</Text>
+              </View>
+              <Text style={styles.stepText}>{step}</Text>
+            </View>
+          ))}
+        </View>
+      ))}
+    </ScrollView>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: { padding: 20, paddingBottom: 60 },
+  card: {
+    backgroundColor: '#1B4332', borderRadius: 14, padding: 18, marginBottom: 18,
+    borderWidth: 1, borderColor: 'rgba(212, 175, 55, 0.3)',
+  },
+  sectionTitle: { color: '#D4AF37', fontSize: 18, fontWeight: 'bold', marginBottom: 14 },
+  stepRow: { flexDirection: 'row', marginBottom: 12, alignItems: 'flex-start' },
+  stepNumber: {
+    width: 24, height: 24, borderRadius: 12, backgroundColor: '#D4AF37',
+    alignItems: 'center', justifyContent: 'center', marginRight: 10, marginTop: 2,
+  },
+  stepNumberText: { color: '#0F2F20', fontWeight: 'bold', fontSize: 12 },
+  stepText: { color: '#E5E7EB', fontSize: 14, lineHeight: 20, flex: 1 },
+});
+</file>
+
+<file path="src/components/deenhub/PlaceholderScreen.tsx">
+import React from 'react';
+import { View, Text, StyleSheet } from 'react-native';
+import { Sparkles } from 'lucide-react-native';
+
+export default function PlaceholderScreen({ name, description }: { name: string; description: string }) {
+  return (
+    <View style={styles.container}>
+      <View style={styles.iconCircle}>
+        <Sparkles color="#D4AF37" size={36} />
+      </View>
+      <Text style={styles.title}>{name}</Text>
+      <Text style={styles.description}>{description}</Text>
+      <View style={styles.badge}>
+        <Text style={styles.badgeText}>On the Roadmap</Text>
+      </View>
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: 32 },
+  iconCircle: {
+    width: 80, height: 80, borderRadius: 40, backgroundColor: '#1B4332',
+    alignItems: 'center', justifyContent: 'center', marginBottom: 20,
+    borderWidth: 1, borderColor: 'rgba(212, 175, 55, 0.4)',
+  },
+  title: { color: '#D4AF37', fontSize: 22, fontWeight: 'bold', marginBottom: 12, textAlign: 'center' },
+  description: { color: '#A0A0A0', fontSize: 14, textAlign: 'center', lineHeight: 21, marginBottom: 24 },
+  badge: { backgroundColor: 'rgba(212, 175, 55, 0.15)', paddingHorizontal: 16, paddingVertical: 8, borderRadius: 20 },
+  badgeText: { color: '#D4AF37', fontSize: 12, fontWeight: '600' },
+});
+</file>
+
+<file path="src/components/deenhub/PrayerTimesScreen.tsx">
+import React, { useEffect, useState } from 'react';
+import { View, Text, StyleSheet, ActivityIndicator } from 'react-native';
+import { getCoords, fetchPrayerTimes, getActivePrayer, PrayerTimeEntry } from '../../services/prayerService';
+
+export default function PrayerTimesScreen() {
+  const [prayerTimes, setPrayerTimes] = useState<PrayerTimeEntry[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const { latitude, longitude } = await getCoords();
+        setPrayerTimes(await fetchPrayerTimes(latitude, longitude));
+      } catch {
+        setError('Could not load prayer times.');
+      } finally {
+        setLoading(false);
+      }
+    })();
+  }, []);
+
+  if (loading) {
+    return (
+      <View style={styles.center}>
+        <ActivityIndicator size="large" color="#D4AF37" />
+      </View>
+    );
+  }
+
+  if (error) {
+    return (
+      <View style={styles.center}>
+        <Text style={styles.errorText}>{error}</Text>
+      </View>
+    );
+  }
+
+  const active = getActivePrayer(prayerTimes);
+
+  return (
+    <View style={styles.container}>
+      {prayerTimes.map((p) => (
+        <View key={p.name} style={[styles.row, p.name === active && styles.activeRow]}>
+          <Text style={[styles.name, p.name === active && styles.activeText]}>{p.name}</Text>
+          <Text style={[styles.time, p.name === active && styles.activeText]}>{p.time}</Text>
+        </View>
+      ))}
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: { padding: 20 },
+  center: { flex: 1, alignItems: 'center', justifyContent: 'center' },
+  errorText: { color: '#FF4444' },
+  row: {
+    flexDirection: 'row', justifyContent: 'space-between', backgroundColor: '#1B4332',
+    padding: 16, borderRadius: 12, marginBottom: 10, borderWidth: 1, borderColor: 'rgba(212, 175, 55, 0.2)',
+  },
+  activeRow: { borderColor: '#D4AF37', borderWidth: 2 },
+  name: { color: '#FFFFFF', fontSize: 16, fontWeight: '600' },
+  time: { color: '#A0A0A0', fontSize: 16 },
+  activeText: { color: '#D4AF37' },
+});
+</file>
+
+<file path="src/components/deenhub/QiblaScreen.tsx">
+import React, { useEffect, useState, useRef } from 'react';
+import { View, Text, StyleSheet, ActivityIndicator } from 'react-native';
+import * as Location from 'expo-location';
+import { Navigation } from 'lucide-react-native';
+
+const KAABA = { latitude: 21.4225, longitude: 39.8262 };
+
+const toRad = (deg: number) => (deg * Math.PI) / 180;
+const toDeg = (rad: number) => (rad * 180) / Math.PI;
+
+/** Great-circle bearing from point A to point B, in degrees from true North. */
+const calculateBearing = (lat1: number, lon1: number, lat2: number, lon2: number) => {
+  const dLon = toRad(lon2 - lon1);
+  const y = Math.sin(dLon) * Math.cos(toRad(lat2));
+  const x =
+    Math.cos(toRad(lat1)) * Math.sin(toRad(lat2)) -
+    Math.sin(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.cos(dLon);
+  const bearing = toDeg(Math.atan2(y, x));
+  return (bearing + 360) % 360;
+};
+
+export default function QiblaScreen() {
+  const [qiblaBearing, setQiblaBearing] = useState<number | null>(null);
+  const [heading, setHeading] = useState(0);
+  const [error, setError] = useState<string | null>(null);
+  const subscription = useRef<Location.LocationSubscription | null>(null);
+
+  useEffect(() => {
+    (async () => {
+      const { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== 'granted') {
+        setError('Location permission is required to find the Qiblah direction.');
+        return;
+      }
+
+      try {
+        const loc = await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Balanced });
+        const bearing = calculateBearing(
+          loc.coords.latitude,
+          loc.coords.longitude,
+          KAABA.latitude,
+          KAABA.longitude
+        );
+        setQiblaBearing(bearing);
+      } catch {
+        setError('Could not determine your location.');
+      }
+
+      subscription.current = await Location.watchHeadingAsync((h) => {
+        setHeading(h.trueHeading >= 0 ? h.trueHeading : h.magHeading);
+      });
+    })();
+
+    return () => {
+      subscription.current?.remove();
+    };
+  }, []);
+
+  if (error) {
+    return (
+      <View style={styles.center}>
+        <Text style={styles.errorText}>{error}</Text>
+      </View>
+    );
+  }
+
+  if (qiblaBearing === null) {
+    return (
+      <View style={styles.center}>
+        <ActivityIndicator size="large" color="#D4AF37" />
+      </View>
+    );
+  }
+
+  // Rotate the arrow relative to device heading so it always points to Kaaba
+  const arrowRotation = (qiblaBearing - heading + 360) % 360;
+
+  return (
+    <View style={styles.container}>
+      <Text style={styles.subtitle}>Point your device North, then align the arrow</Text>
+      <View style={styles.compassCircle}>
+        <View style={[styles.arrowWrapper, { transform: [{ rotate: `${arrowRotation}deg` }] }]}>
+          <Navigation color="#D4AF37" size={72} fill="#D4AF37" />
+        </View>
+        <Text style={styles.nText}>N</Text>
+      </View>
+      <Text style={styles.bearingText}>Qiblah is {Math.round(qiblaBearing)}° from true North</Text>
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: 24 },
+  center: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: 24 },
+  subtitle: { color: '#A0A0A0', fontSize: 14, textAlign: 'center', marginBottom: 30 },
+  compassCircle: {
+    width: 260, height: 260, borderRadius: 130, backgroundColor: '#1B4332',
+    borderWidth: 2, borderColor: '#D4AF37', alignItems: 'center', justifyContent: 'center',
+  },
+  arrowWrapper: { alignItems: 'center', justifyContent: 'center' },
+  nText: { position: 'absolute', top: 10, color: '#FFFFFF', fontWeight: 'bold' },
+  bearingText: { color: '#FFFFFF', fontSize: 16, marginTop: 24 },
+  errorText: { color: '#FF4444', textAlign: 'center' },
+});
+</file>
+
+<file path="src/components/deenhub/QuranScreen.tsx">
+import React, { useEffect, useState } from 'react';
+import { View, Text, StyleSheet, FlatList, TouchableOpacity, ActivityIndicator } from 'react-native';
+import axios from 'axios';
+import { ChevronLeft } from 'lucide-react-native';
+
+interface Surah {
+  number: number;
+  name: string;
+  englishName: string;
+  englishNameTranslation: string;
+  numberOfAyahs: number;
+}
+
+interface Ayah {
+  numberInSurah: number;
+  text: string;
+  translation?: string;
+}
+
+export default function QuranScreen() {
+  const [surahs, setSurahs] = useState<Surah[]>([]);
+  const [selectedSurah, setSelectedSurah] = useState<Surah | null>(null);
+  const [ayahs, setAyahs] = useState<Ayah[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [loadingAyahs, setLoadingAyahs] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    axios
+      .get('https://api.alquran.cloud/v1/surah')
+      .then((res) => setSurahs(res.data.data))
+      .catch(() => setError('Could not load the Surah list. Check your connection.'))
+      .finally(() => setLoading(false));
+  }, []);
+
+  const openSurah = async (surah: Surah) => {
+    setSelectedSurah(surah);
+    setLoadingAyahs(true);
+    try {
+      const [arabicRes, translationRes] = await Promise.all([
+        axios.get(`https://api.alquran.cloud/v1/surah/${surah.number}`),
+        axios.get(`https://api.alquran.cloud/v1/surah/${surah.number}/en.asad`),
+      ]);
+      const arabicAyahs = arabicRes.data.data.ayahs;
+      const translationAyahs = translationRes.data.data.ayahs;
+      setAyahs(
+        arabicAyahs.map((a: any, i: number) => ({
+          numberInSurah: a.numberInSurah,
+          text: a.text,
+          translation: translationAyahs[i]?.text,
+        }))
+      );
+    } catch {
+      setError('Could not load this Surah. Check your connection.');
+    } finally {
+      setLoadingAyahs(false);
+    }
+  };
+
+  if (loading) {
+    return (
+      <View style={styles.center}>
+        <ActivityIndicator size="large" color="#D4AF37" />
+      </View>
+    );
+  }
+
+  if (error && !selectedSurah) {
+    return (
+      <View style={styles.center}>
+        <Text style={styles.errorText}>{error}</Text>
+      </View>
+    );
+  }
+
+  if (selectedSurah) {
+    return (
+      <View style={styles.flex}>
+        <TouchableOpacity style={styles.backRow} onPress={() => setSelectedSurah(null)}>
+          <ChevronLeft color="#D4AF37" size={20} />
+          <Text style={styles.backText}>All Surahs</Text>
+        </TouchableOpacity>
+        <Text style={styles.surahTitle}>
+          {selectedSurah.englishName} — {selectedSurah.name}
+        </Text>
+        {loadingAyahs ? (
+          <ActivityIndicator size="large" color="#D4AF37" style={{ marginTop: 40 }} />
+        ) : (
+          <FlatList
+            data={ayahs}
+            keyExtractor={(a) => String(a.numberInSurah)}
+            contentContainerStyle={styles.ayahList}
+            renderItem={({ item }) => (
+              <View style={styles.ayahCard}>
+                <Text style={styles.ayahNumber}>{item.numberInSurah}</Text>
+                <Text style={styles.ayahArabic}>{item.text}</Text>
+                {item.translation && <Text style={styles.ayahTranslation}>{item.translation}</Text>}
+              </View>
+            )}
+          />
+        )}
+      </View>
+    );
+  }
+
+  return (
+    <FlatList
+      data={surahs}
+      keyExtractor={(s) => String(s.number)}
+      contentContainerStyle={styles.list}
+      renderItem={({ item }) => (
+        <TouchableOpacity style={styles.surahRow} onPress={() => openSurah(item)}>
+          <View style={styles.surahNumberBadge}>
+            <Text style={styles.surahNumberText}>{item.number}</Text>
+          </View>
+          <View style={styles.surahInfo}>
+            <Text style={styles.surahName}>{item.englishName}</Text>
+            <Text style={styles.surahMeta}>
+              {item.englishNameTranslation} · {item.numberOfAyahs} Ayahs
+            </Text>
+          </View>
+          <Text style={styles.surahArabicName}>{item.name}</Text>
+        </TouchableOpacity>
+      )}
+    />
+  );
+}
+
+const styles = StyleSheet.create({
+  flex: { flex: 1 },
+  center: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: 24 },
+  errorText: { color: '#FF4444', textAlign: 'center' },
+  list: { padding: 16 },
+  surahRow: {
+    flexDirection: 'row', alignItems: 'center', backgroundColor: '#1B4332',
+    borderRadius: 12, padding: 14, marginBottom: 10, borderWidth: 1, borderColor: 'rgba(212, 175, 55, 0.2)',
+  },
+  surahNumberBadge: {
+    width: 32, height: 32, borderRadius: 16, borderWidth: 1, borderColor: '#D4AF37',
+    alignItems: 'center', justifyContent: 'center', marginRight: 12,
+  },
+  surahNumberText: { color: '#D4AF37', fontSize: 12, fontWeight: 'bold' },
+  surahInfo: { flex: 1 },
+  surahName: { color: '#FFFFFF', fontSize: 15, fontWeight: '600' },
+  surahMeta: { color: '#A0A0A0', fontSize: 12, marginTop: 2 },
+  surahArabicName: { color: '#D4AF37', fontSize: 18 },
+  backRow: { flexDirection: 'row', alignItems: 'center', padding: 12 },
+  backText: { color: '#D4AF37', marginLeft: 4 },
+  surahTitle: { color: '#D4AF37', fontSize: 18, fontWeight: 'bold', textAlign: 'center', marginBottom: 10 },
+  ayahList: { padding: 16 },
+  ayahCard: {
+    backgroundColor: '#1B4332', borderRadius: 12, padding: 14, marginBottom: 10,
+    borderWidth: 1, borderColor: 'rgba(212, 175, 55, 0.15)',
+  },
+  ayahNumber: { color: '#D4AF37', fontSize: 12, marginBottom: 6 },
+  ayahArabic: { color: '#FFFFFF', fontSize: 20, textAlign: 'right', lineHeight: 34, marginBottom: 8 },
+  ayahTranslation: { color: '#A0A0A0', fontSize: 13, lineHeight: 19 },
+});
+</file>
+
+<file path="src/components/deenhub/RozaScreen.tsx">
+import React, { useState } from 'react';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import { CheckSquare, Square } from 'lucide-react-native';
+
+const RULINGS = [
+  { id: '1', title: 'Intention (Niyyah)', content: 'The intention to fast must be made before Fajr for obligatory fasts. It is a state of mind and does not need to be uttered aloud.' },
+  { id: '2', title: 'Things that break the fast', content: 'Eating, drinking, or engaging in intimate relations intentionally between Fajr and Maghrib. Induced vomiting also breaks the fast.' },
+  { id: '3', title: 'Exemptions', content: 'The sick, travelers, pregnant or nursing women, and the elderly who cannot bear fasting are exempt but must make it up later or feed the poor (Fidyah).' },
+];
+
+export default function RozaScreen() {
+  const [fastingChecklist, setFastingChecklist] = useState({
+    suhoor: false,
+    fajr: false,
+    dhuhr: false,
+    asr: false,
+    iftar: false,
+    maghrib: false,
+    isha: false,
+    taraweeh: false,
+  });
+
+  const toggleCheck = (key: keyof typeof fastingChecklist) => {
+    setFastingChecklist((prev) => ({ ...prev, [key]: !prev[key] }));
+  };
+
+  const renderCheckItem = (key: keyof typeof fastingChecklist, label: string) => {
+    const isChecked = fastingChecklist[key];
+    return (
+      <TouchableOpacity style={styles.checkItem} onPress={() => toggleCheck(key)} activeOpacity={0.7}>
+        {isChecked ? <CheckSquare color="#D4AF37" size={24} /> : <Square color="#555" size={24} />}
+        <Text style={[styles.checkLabel, isChecked && styles.checkLabelDone]}>{label}</Text>
+      </TouchableOpacity>
+    );
+  };
+
+  return (
+    <ScrollView style={styles.container} contentContainerStyle={styles.content}>
+      <Text style={styles.sectionTitle}>Daily Ramadan Tracker</Text>
+      <View style={styles.trackerCard}>
+        {renderCheckItem('suhoor', 'Woke up for Suhoor')}
+        {renderCheckItem('fajr', 'Fajr Prayer')}
+        {renderCheckItem('dhuhr', 'Dhuhr Prayer')}
+        {renderCheckItem('asr', 'Asr Prayer')}
+        {renderCheckItem('iftar', 'Broke fast on time (Iftar)')}
+        {renderCheckItem('maghrib', 'Maghrib Prayer')}
+        {renderCheckItem('isha', 'Isha Prayer')}
+        {renderCheckItem('taraweeh', 'Taraweeh Prayer')}
+      </View>
+
+      <Text style={[styles.sectionTitle, { marginTop: 30 }]}>Fasting Rulings (Fiqh)</Text>
+      {RULINGS.map((rule) => (
+        <View key={rule.id} style={styles.ruleCard}>
+          <Text style={styles.ruleTitle}>{rule.title}</Text>
+          <Text style={styles.ruleContent}>{rule.content}</Text>
+        </View>
+      ))}
+    </ScrollView>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: { flex: 1, backgroundColor: '#0F2F20' },
+  content: { padding: 20 },
+  sectionTitle: { color: '#D4AF37', fontSize: 20, fontWeight: 'bold', marginBottom: 16 },
+  trackerCard: {
+    backgroundColor: '#1B4332',
+    borderRadius: 16,
+    padding: 16,
+    borderWidth: 1,
+    borderColor: 'rgba(212, 175, 55, 0.2)',
+  },
+  checkItem: { flexDirection: 'row', alignItems: 'center', paddingVertical: 12, borderBottomWidth: 1, borderBottomColor: 'rgba(255,255,255,0.05)' },
+  checkLabel: { color: '#FFF', fontSize: 16, marginLeft: 12 },
+  checkLabelDone: { color: '#A0A0A0', textDecorationLine: 'line-through' },
+  ruleCard: {
+    backgroundColor: '#1B4332',
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 12,
+  },
+  ruleTitle: { color: '#FFF', fontSize: 16, fontWeight: 'bold', marginBottom: 8 },
+  ruleContent: { color: '#A0A0A0', fontSize: 14, lineHeight: 22 },
+});
+</file>
+
+<file path="src/components/deenhub/TafseerScreen.tsx">
+import React, { useState, useEffect } from 'react';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, ActivityIndicator } from 'react-native';
+import axios from 'axios';
+
+// Helper to remove HTML tags like <p>, </p>, etc.
+const stripHtml = (html: string) => {
+  return html.replace(/<[^>]*>?/gm, '');
+};
+
+interface Chapter {
+  id: number;
+  name_simple: string;
+  translated_name: { name: string };
+}
+
+interface TafsirVerse {
+  id: number;
+  verse_key: string;
+  text: string;
+}
+
+export default function TafseerScreen() {
+  const [chapters, setChapters] = useState<Chapter[]>([]);
+  const [selectedChapter, setSelectedChapter] = useState<number | null>(null);
+  const [tafsirData, setTafsirData] = useState<TafsirVerse[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+
+  // Fetch chapters list on mount
+  useEffect(() => {
+    const fetchChapters = async () => {
+      try {
+        const response = await axios.get('https://api.quran.com/api/v4/chapters');
+        setChapters(response.data.chapters);
+      } catch (err) {
+        console.log(err);
+      }
+    };
+    fetchChapters();
+  }, []);
+
+  const loadTafsir = async (chapterId: number) => {
+    setSelectedChapter(chapterId);
+    setLoading(true);
+    setError('');
+    setTafsirData([]);
+    try {
+      // 169 is Ibn Kathir (English) in Quran.com API
+      const response = await axios.get(`https://api.quran.com/api/v4/tafsirs/169/by_chapter/${chapterId}`);
+      if (response.data && response.data.tafsirs) {
+        setTafsirData(response.data.tafsirs);
+      }
+    } catch (err) {
+      console.error(err);
+      setError('Failed to load Tafseer. Please check your connection.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (selectedChapter) {
+    const chapterInfo = chapters.find(c => c.id === selectedChapter);
+    return (
+      <View style={styles.container}>
+        <View style={styles.headerRow}>
+          <TouchableOpacity onPress={() => setSelectedChapter(null)} style={styles.backBtn}>
+            <Text style={styles.backBtnText}>← Back to Surahs</Text>
+          </TouchableOpacity>
+          <Text style={styles.surahTitle}>{chapterInfo?.name_simple}</Text>
+        </View>
+
+        {loading ? (
+          <View style={styles.centerContainer}>
+            <ActivityIndicator size="large" color="#D4AF37" />
+            <Text style={styles.loadingText}>Loading Tafseer Ibn Kathir...</Text>
+          </View>
+        ) : error ? (
+          <View style={styles.centerContainer}>
+            <Text style={styles.errorText}>{error}</Text>
+            <TouchableOpacity onPress={() => loadTafsir(selectedChapter)} style={styles.retryBtn}>
+              <Text style={styles.retryText}>Retry</Text>
+            </TouchableOpacity>
+          </View>
+        ) : (
+          <ScrollView style={styles.container} contentContainerStyle={styles.content}>
+            <Text style={styles.sourceText}>Source: Tafsir Ibn Kathir (Abridged)</Text>
+            {tafsirData.map((verse) => (
+              <View key={verse.id} style={styles.card}>
+                <View style={styles.verseBadge}>
+                  <Text style={styles.verseBadgeText}>Ayah {verse.verse_key}</Text>
+                </View>
+                <Text style={styles.body}>{stripHtml(verse.text)}</Text>
+              </View>
+            ))}
+          </ScrollView>
+        )}
+      </View>
+    );
+  }
+
+  return (
+    <View style={styles.container}>
+      <View style={styles.introContainer}>
+        <Text style={styles.intro}>
+          Select a Surah to read its verse-by-verse commentary from Tafsir Ibn Kathir.
+        </Text>
+      </View>
+      <ScrollView contentContainerStyle={styles.listContent}>
+        {chapters.length === 0 ? (
+          <ActivityIndicator size="large" color="#D4AF37" style={{ marginTop: 40 }} />
+        ) : (
+          chapters.map(chapter => (
+            <TouchableOpacity
+              key={chapter.id}
+              style={styles.chapterCard}
+              activeOpacity={0.7}
+              onPress={() => loadTafsir(chapter.id)}
+            >
+              <View style={styles.chapterNumberBox}>
+                <Text style={styles.chapterNumber}>{chapter.id}</Text>
+              </View>
+              <View style={styles.chapterInfo}>
+                <Text style={styles.chapterName}>{chapter.name_simple}</Text>
+                <Text style={styles.chapterTranslate}>{chapter.translated_name.name}</Text>
+              </View>
+            </TouchableOpacity>
+          ))
+        )}
+      </ScrollView>
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: { flex: 1, backgroundColor: '#0F2F20' },
+  introContainer: { padding: 20, paddingBottom: 0 },
+  content: { padding: 20 },
+  listContent: { padding: 20, paddingTop: 10 },
+  intro: { color: '#A0A0A0', fontSize: 14, lineHeight: 22, fontStyle: 'italic' },
+  chapterCard: {
+    backgroundColor: '#1B4332',
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 12,
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: 'rgba(212, 175, 55, 0.15)',
+  },
+  chapterNumberBox: {
+    width: 40, height: 40, borderRadius: 20, backgroundColor: 'rgba(212, 175, 55, 0.2)',
+    alignItems: 'center', justifyContent: 'center', marginRight: 16
+  },
+  chapterNumber: { color: '#D4AF37', fontWeight: 'bold' },
+  chapterInfo: { flex: 1 },
+  chapterName: { color: '#FFF', fontSize: 16, fontWeight: 'bold' },
+  chapterTranslate: { color: '#A0A0A0', fontSize: 13, marginTop: 4 },
+  
+  headerRow: { flexDirection: 'row', alignItems: 'center', padding: 20, borderBottomWidth: 1, borderBottomColor: 'rgba(255,255,255,0.1)', justifyContent: 'space-between' },
+  backBtn: { backgroundColor: 'rgba(212, 175, 55, 0.1)', paddingHorizontal: 12, paddingVertical: 6, borderRadius: 16 },
+  backBtnText: { color: '#D4AF37', fontWeight: '600', fontSize: 14 },
+  surahTitle: { color: '#FFF', fontSize: 18, fontWeight: 'bold' },
+  
+  centerContainer: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: 20 },
+  loadingText: { color: '#D4AF37', marginTop: 16, fontWeight: '600' },
+  errorText: { color: '#E74C3C', textAlign: 'center', marginBottom: 20, fontSize: 16 },
+  retryBtn: { backgroundColor: '#D4AF37', paddingHorizontal: 24, paddingVertical: 12, borderRadius: 20 },
+  retryText: { color: '#0F2F20', fontWeight: 'bold' },
+
+  sourceText: { color: '#D4AF37', fontSize: 13, fontStyle: 'italic', marginBottom: 20, textAlign: 'center' },
+  card: {
+    backgroundColor: '#1B4332',
+    borderRadius: 16,
+    padding: 20,
+    marginBottom: 20,
+    borderWidth: 1,
+    borderColor: 'rgba(212, 175, 55, 0.15)',
+  },
+  verseBadge: { alignSelf: 'flex-start', backgroundColor: 'rgba(212, 175, 55, 0.15)', paddingHorizontal: 12, paddingVertical: 6, borderRadius: 12, marginBottom: 16 },
+  verseBadgeText: { color: '#D4AF37', fontSize: 13, fontWeight: 'bold' },
+  body: { color: '#FFF', fontSize: 15, lineHeight: 26, opacity: 0.9 },
+});
+</file>
+
+<file path="src/components/deenhub/TasbihScreen.tsx">
+import React, { useState } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { RotateCcw } from 'lucide-react-native';
+
+const DHIKR_OPTIONS = ['SubhanAllah', 'Alhamdulillah', 'Allahu Akbar', 'La ilaha illallah'];
+
+export default function TasbihScreen() {
+  const [dhikrIndex, setDhikrIndex] = useState(0);
+  const [count, setCount] = useState(0);
+  const [target] = useState(33);
+
+  const increment = () => setCount((c) => c + 1);
+  const reset = () => setCount(0);
+  const nextDhikr = () => {
+    setDhikrIndex((i) => (i + 1) % DHIKR_OPTIONS.length);
+    setCount(0);
+  };
+
+  const completedRounds = Math.floor(count / target);
+  const inRound = count % target;
+
+  return (
+    <View style={styles.container}>
+      <TouchableOpacity onPress={nextDhikr}>
+        <Text style={styles.dhikrText}>{DHIKR_OPTIONS[dhikrIndex]}</Text>
+        <Text style={styles.hint}>Tap to change Dhikr</Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity style={styles.counterCircle} onPress={increment} activeOpacity={0.7}>
+        <Text style={styles.countText}>{inRound}</Text>
+        <Text style={styles.targetText}>/ {target}</Text>
+      </TouchableOpacity>
+
+      <Text style={styles.totalText}>Total: {count} · Rounds completed: {completedRounds}</Text>
+
+      <TouchableOpacity style={styles.resetBtn} onPress={reset}>
+        <RotateCcw color="#0F2F20" size={18} />
+        <Text style={styles.resetText}>Reset</Text>
+      </TouchableOpacity>
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: 24 },
+  dhikrText: { color: '#D4AF37', fontSize: 26, fontWeight: 'bold', textAlign: 'center' },
+  hint: { color: '#A0A0A0', fontSize: 12, textAlign: 'center', marginTop: 4, marginBottom: 40 },
+  counterCircle: {
+    width: 220, height: 220, borderRadius: 110, backgroundColor: '#1B4332',
+    borderWidth: 3, borderColor: '#D4AF37', alignItems: 'center', justifyContent: 'center',
+  },
+  countText: { color: '#FFFFFF', fontSize: 64, fontWeight: 'bold' },
+  targetText: { color: '#A0A0A0', fontSize: 18 },
+  totalText: { color: '#FFFFFF', fontSize: 16, marginTop: 30 },
+  resetBtn: {
+    flexDirection: 'row', alignItems: 'center', backgroundColor: '#D4AF37',
+    paddingHorizontal: 20, paddingVertical: 12, borderRadius: 12, marginTop: 20,
+  },
+  resetText: { color: '#0F2F20', fontWeight: 'bold', marginLeft: 8 },
+});
+</file>
+
+<file path="src/components/deenhub/ZakatScreen.tsx">
+import React, { useState, useMemo } from 'react';
+import { View, Text, StyleSheet, TextInput, ScrollView } from 'react-native';
+
+const ZAKAT_RATE = 0.025;
+// Nisab reference (approx. value of 87.48g gold). Editable by the user for accuracy.
+const DEFAULT_NISAB_BDT = 800000;
+
+export default function ZakatScreen() {
+  const [cash, setCash] = useState('');
+  const [gold, setGold] = useState('');
+  const [investments, setInvestments] = useState('');
+  const [liabilities, setLiabilities] = useState('');
+  const [nisab, setNisab] = useState(String(DEFAULT_NISAB_BDT));
+
+  const num = (v: string) => parseFloat(v.replace(/,/g, '')) || 0;
+
+  const { totalWealth, netWealth, zakatDue, isEligible } = useMemo(() => {
+    const total = num(cash) + num(gold) + num(investments);
+    const net = total - num(liabilities);
+    const eligible = net >= num(nisab);
+    return {
+      totalWealth: total,
+      netWealth: net,
+      zakatDue: eligible ? net * ZAKAT_RATE : 0,
+      isEligible: eligible,
+    };
+  }, [cash, gold, investments, liabilities, nisab]);
+
+  return (
+    <ScrollView contentContainerStyle={styles.container}>
+      <Text style={styles.note}>
+        Enter approximate values in your currency (BDT). Zakat is 2.5% of wealth held for one
+        lunar year, above the Nisab threshold.
+      </Text>
+
+      <Field label="Cash & Bank Savings" value={cash} onChange={setCash} />
+      <Field label="Gold & Silver (market value)" value={gold} onChange={setGold} />
+      <Field label="Investments / Business Assets" value={investments} onChange={setInvestments} />
+      <Field label="Debts / Liabilities Owed" value={liabilities} onChange={setLiabilities} />
+      <Field label="Nisab Threshold (editable)" value={nisab} onChange={setNisab} />
+
+      <View style={styles.resultCard}>
+        <Row label="Total Wealth" value={totalWealth} />
+        <Row label="Net Wealth (after debts)" value={netWealth} />
+        <View style={styles.divider} />
+        {isEligible ? (
+          <>
+            <Text style={styles.eligibleText}>You meet the Nisab threshold.</Text>
+            <Row label="Zakat Due (2.5%)" value={zakatDue} highlight />
+          </>
+        ) : (
+          <Text style={styles.notEligibleText}>
+            Your net wealth is below Nisab — Zakat is not obligatory this year.
+          </Text>
+        )}
+      </View>
+
+      <Text style={styles.disclaimer}>
+        This is an estimate for guidance only. For precise rulings (especially on business
+        assets, jewelry-for-use exemptions, or mixed currencies), consult a qualified scholar.
+      </Text>
+    </ScrollView>
+  );
+}
+
+function Field({ label, value, onChange }: { label: string; value: string; onChange: (v: string) => void }) {
+  return (
+    <View style={styles.fieldWrapper}>
+      <Text style={styles.fieldLabel}>{label}</Text>
+      <TextInput
+        style={styles.input}
+        value={value}
+        onChangeText={onChange}
+        keyboardType="numeric"
+        placeholder="0"
+        placeholderTextColor="#6B7280"
+      />
+    </View>
+  );
+}
+
+function Row({ label, value, highlight }: { label: string; value: number; highlight?: boolean }) {
+  return (
+    <View style={styles.row}>
+      <Text style={styles.rowLabel}>{label}</Text>
+      <Text style={[styles.rowValue, highlight && styles.rowValueHighlight]}>
+        {value.toLocaleString(undefined, { maximumFractionDigits: 2 })}
+      </Text>
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: { padding: 20, paddingBottom: 60 },
+  note: { color: '#A0A0A0', fontSize: 13, lineHeight: 18, marginBottom: 20 },
+  fieldWrapper: { marginBottom: 14 },
+  fieldLabel: { color: '#FFFFFF', fontSize: 14, marginBottom: 6 },
+  input: {
+    backgroundColor: '#1B4332', color: '#FFFFFF', borderRadius: 10, padding: 12,
+    borderWidth: 1, borderColor: 'rgba(212, 175, 55, 0.3)',
+  },
+  resultCard: {
+    backgroundColor: '#1B4332', borderRadius: 16, padding: 18, marginTop: 12,
+    borderWidth: 1, borderColor: '#D4AF37',
+  },
+  row: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 10 },
+  rowLabel: { color: '#A0A0A0', fontSize: 14 },
+  rowValue: { color: '#FFFFFF', fontSize: 14, fontWeight: '600' },
+  rowValueHighlight: { color: '#D4AF37', fontSize: 20, fontWeight: 'bold' },
+  divider: { height: 1, backgroundColor: 'rgba(212, 175, 55, 0.2)', marginVertical: 8 },
+  eligibleText: { color: '#4ADE80', fontSize: 13, marginBottom: 8 },
+  notEligibleText: { color: '#A0A0A0', fontSize: 13 },
+  disclaimer: { color: '#6B7280', fontSize: 11, marginTop: 20, lineHeight: 16 },
+});
+</file>
+
+<file path="src/components/AmbientGlow.tsx">
+import React, { useEffect } from 'react';
+import { StyleSheet, View } from 'react-native';
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  withRepeat,
+  withTiming,
+  Easing,
+  interpolate,
+} from 'react-native-reanimated';
+
+/**
+ * Lightweight, dependency-free replacement for the broken empty Lottie
+ * files (fire.json / garden.json were placeholder stubs with no layers
+ * and rendered nothing). This renders a soft pulsing radial glow —
+ * green for "Jannat mode", red/orange for "Istighfar mode" — using
+ * react-native-reanimated, which is already a project dependency.
+ */
+export default function AmbientGlow({ mode }: { mode: 'positive' | 'negative' }) {
+  const pulse = useSharedValue(0);
+
+  useEffect(() => {
+    pulse.value = withRepeat(
+      withTiming(1, { duration: 2800, easing: Easing.inOut(Easing.sin) }),
+      -1,
+      true
+    );
+  }, []);
+
+  const orb1Style = useAnimatedStyle(() => ({
+    opacity: interpolate(pulse.value, [0, 1], [0.15, 0.35]),
+    transform: [{ scale: interpolate(pulse.value, [0, 1], [0.9, 1.15]) }],
+  }));
+
+  const orb2Style = useAnimatedStyle(() => ({
+    opacity: interpolate(pulse.value, [0, 1], [0.3, 0.1]),
+    transform: [{ scale: interpolate(pulse.value, [0, 1], [1.1, 0.85]) }],
+  }));
+
+  const positive = mode === 'positive';
+  const primaryColor = positive ? '#2ECC71' : '#FF4444';
+  const secondaryColor = positive ? '#D4AF37' : '#FF8C42';
+
+  return (
+    <View style={StyleSheet.absoluteFill} pointerEvents="none">
+      <Animated.View
+        style={[styles.orb, styles.orbTop, { backgroundColor: primaryColor }, orb1Style]}
+      />
+      <Animated.View
+        style={[styles.orb, styles.orbBottom, { backgroundColor: secondaryColor }, orb2Style]}
+      />
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  orb: {
+    position: 'absolute',
+    width: 320,
+    height: 320,
+    borderRadius: 200,
+  },
+  orbTop: { top: -80, left: -60 },
+  orbBottom: { bottom: -100, right: -80 },
+});
+</file>
+
+<file path="src/components/AnalogClock.tsx">
+import React, { useEffect, useState } from 'react';
+import { View, StyleSheet } from 'react-native';
+
+interface AnalogClockProps {
+  size?: number;
+}
+
+export default function AnalogClock({ size = 180 }: AnalogClockProps) {
+  const [time, setTime] = useState(new Date());
+
+  useEffect(() => {
+    const timer = setInterval(() => setTime(new Date()), 1000);
+    return () => clearInterval(timer);
+  }, []);
+
+  const hours = time.getHours() % 12;
+  const minutes = time.getMinutes();
+  const seconds = time.getSeconds();
+
+  // Calculate rotations
+  const hrRotation = `${(hours * 30) + (minutes * 0.5)}deg`;
+  const minRotation = `${minutes * 6}deg`;
+  const secRotation = `${seconds * 6}deg`;
+
+  const radius = size / 2;
+
+  // Render a hand using the transparent-bottom trick for perfect center rotation
+  const renderHand = (
+    rotation: string,
+    width: number,
+    color: string,
+    lengthMultiplier: number
+  ) => {
+    const handLength = radius * lengthMultiplier;
+    return (
+      <View
+        style={[
+          styles.handWrapper,
+          {
+            width: size,
+            height: size,
+            transform: [{ rotate: rotation }],
+          },
+        ]}
+      >
+        <View style={{ flex: 1, alignItems: 'center', justifyContent: 'flex-end' }}>
+          <View
+            style={{
+              width,
+              height: handLength,
+              backgroundColor: color,
+              borderTopLeftRadius: width / 2,
+              borderTopRightRadius: width / 2,
+              // Pull it down slightly so it hides under the center pin
+              marginBottom: -4, 
+            }}
+          />
+        </View>
+        <View style={{ flex: 1 }} /> {/* Transparent bottom half */}
+      </View>
+    );
+  };
+
+  return (
+    <View style={[styles.clockContainer, { width: size, height: size, borderRadius: radius }]}>
+      {/* Clock Face Dots */}
+      <View style={[styles.dot, styles.dot12]} />
+      <View style={[styles.dot, styles.dot3]} />
+      <View style={[styles.dot, styles.dot6]} />
+      <View style={[styles.dot, styles.dot9]} />
+
+      {/* Hands */}
+      {/* Hour Hand */}
+      {renderHand(hrRotation, 6, '#D4AF37', 0.5)}
+      {/* Minute Hand */}
+      {renderHand(minRotation, 4, '#FFFFFF', 0.7)}
+      {/* Second Hand */}
+      {renderHand(secRotation, 2, '#E74C3C', 0.85)}
+
+      {/* Center Pin */}
+      <View style={styles.centerPin} />
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  clockContainer: {
+    backgroundColor: 'rgba(27, 67, 50, 0.8)', // Deep green, semi-transparent
+    borderWidth: 4,
+    borderColor: '#D4AF37', // Gold border
+    justifyContent: 'center',
+    alignItems: 'center',
+    alignSelf: 'center',
+    marginBottom: 10,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 5,
+    elevation: 8,
+  },
+  dot: {
+    position: 'absolute',
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: '#D4AF37',
+  },
+  dot12: { top: 10 },
+  dot3: { right: 10 },
+  dot6: { bottom: 10 },
+  dot9: { left: 10 },
+  handWrapper: {
+    position: 'absolute',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  centerPin: {
+    position: 'absolute',
+    width: 14,
+    height: 14,
+    borderRadius: 7,
+    backgroundColor: '#D4AF37',
+    borderWidth: 2,
+    borderColor: '#1B4332',
+    zIndex: 10,
+  },
+});
+</file>
+
+<file path="src/config/deenHubFeatures.ts">
+import {
+  BookOpen, Clock, Book, Heart, MessageCircle, HelpCircle, Video, List,
+  DollarSign, Calendar, Navigation, PlusSquare, BookMarked, MessageSquare,
+} from 'lucide-react-native';
+
+export type FeatureType =
+  | 'quran' | 'prayertimes' | 'dua' | 'hadith' | 'masail' | 'tasbih'
+  | 'qibla' | 'zakat' | 'namazguide' | 'tafseer' | 'books' | 'quiz'
+  | 'bayan' | 'quranlearning' | 'articles' | 'hajjumrah' | 'roza' | 'placeholder';
+
+export interface DeenHubFeature {
+  slug: string;
+  name: string;
+  icon: any;
+  type: FeatureType;
+  description: string; // used on placeholder / detail header
+}
+
+export const DEEN_HUB_FEATURES: DeenHubFeature[] = [
+  { slug: 'tafseer', name: 'Tafseer', icon: BookOpen, type: 'tafseer', description: 'Verse-by-verse Quranic commentary from classical and contemporary scholars.' },
+  { slug: 'prayer-times', name: 'Prayer Times', icon: Clock, type: 'prayertimes', description: 'Full daily prayer schedule for your current location.' },
+  { slug: 'quran', name: 'Quran', icon: Book, type: 'quran', description: 'Browse and read all 114 Surahs with Arabic text and translation.' },
+  { slug: 'dua', name: 'Dua', icon: Heart, type: 'dua', description: 'A curated collection of daily supplications from the Quran and Sunnah.' },
+  { slug: 'books', name: 'Books', icon: BookMarked, type: 'books', description: 'A digital library of foundational Islamic texts and modern reads.' },
+  { slug: 'hadith', name: 'Hadith', icon: BookOpen, type: 'hadith', description: 'Authentic narrations from Sahih Bukhari, Sahih Muslim, and other collections.' },
+  { slug: 'masail', name: 'Masail', icon: MessageCircle, type: 'masail', description: 'Ask everyday Fiqh questions and get AI-assisted, context-aware answers.' },
+  { slug: 'quiz', name: 'Quiz', icon: HelpCircle, type: 'quiz', description: 'Test and reinforce your Islamic knowledge with bite-sized quizzes.' },
+  { slug: 'bayan', name: 'Bayan', icon: Video, type: 'bayan', description: 'Curated video lectures and reminders from trusted scholars.' },
+  { slug: 'quran-learning', name: 'Quran Learning', icon: Book, type: 'quranlearning', description: 'Structured Tajweed lessons and recitation practice, with AI feedback (roadmap).' },
+  { slug: 'articles', name: 'Articles', icon: List, type: 'articles', description: 'Short reads on faith, character, and daily practice.' },
+  { slug: 'tasbih', name: 'Tasbih', icon: PlusSquare, type: 'tasbih', description: 'A digital counter for Dhikr — Subhanallah, Alhamdulillah, Allahu Akbar.' },
+  { slug: 'namaz-guide', name: 'Namaz Guide', icon: Navigation, type: 'namazguide', description: 'Step-by-step guide to Wudu and Salah for every prayer.' },
+  { slug: 'hajj-umrah', name: 'Hajj & Umrah', icon: Navigation, type: 'hajjumrah', description: 'A complete rites-of-passage guide for Hajj and Umrah pilgrims.' },
+  { slug: 'roza', name: 'Roza', icon: Calendar, type: 'roza', description: 'Fasting rulings, Sehri/Iftar timing, and Ramadan planning tools.' },
+  { slug: 'zakat', name: 'Zakat', icon: DollarSign, type: 'zakat', description: 'Calculate your annual Zakat obligation on cash, gold, and savings.' },
+];
+
+export const getFeatureBySlug = (slug: string) =>
+  DEEN_HUB_FEATURES.find((f) => f.slug === slug);
+</file>
+
+<file path="src/config/islamicContent.ts">
+export interface DuaEntry {
+  title: string;
+  arabic: string;
+  meaning: string;
+  reference: string;
+}
+
+export const DUAS: DuaEntry[] = [
+  {
+    title: 'Waking Up',
+    arabic: 'الْحَمْدُ لِلَّهِ الَّذِي أَحْيَانَا بَعْدَ مَا أَمَاتَنَا وَإِلَيْهِ النُّشُورُ',
+    meaning: 'Praise be to Allah who gave us life after having taken it from us, and unto Him is the resurrection.',
+    reference: 'Sahih al-Bukhari',
+  },
+  {
+    title: 'Before Eating',
+    arabic: 'بِسْمِ اللَّهِ',
+    meaning: 'In the name of Allah.',
+    reference: 'Sunan Abi Dawud',
+  },
+  {
+    title: 'Entering the Home',
+    arabic: 'بِسْمِ اللَّهِ وَلَجْنَا وَبِسْمِ اللَّهِ خَرَجْنَا وَعَلَى رَبِّنَا تَوَكَّلْنَا',
+    meaning: 'In the name of Allah we enter, in the name of Allah we leave, and upon our Lord we place our trust.',
+    reference: 'Sunan Abi Dawud',
+  },
+  {
+    title: 'Leaving the Home',
+    arabic: 'بِسْمِ اللَّهِ تَوَكَّلْتُ عَلَى اللَّهِ',
+    meaning: 'In the name of Allah, I place my trust in Allah.',
+    reference: 'Sunan Abi Dawud, Sunan al-Tirmidhi',
+  },
+  {
+    title: 'Before Sleeping',
+    arabic: 'بِاسْمِكَ اللَّهُمَّ أَمُوتُ وَأَحْيَا',
+    meaning: 'In Your name, O Allah, I die and I live.',
+    reference: 'Sahih al-Bukhari',
+  },
+  {
+    title: 'Seeking Forgiveness',
+    arabic: 'أَسْتَغْفِرُ اللَّهَ الْعَظِيمَ الَّذِي لَا إِلَٰهَ إِلَّا هُوَ الْحَيُّ الْقَيُّومُ وَأَتُوبُ إِلَيْهِ',
+    meaning: 'I seek forgiveness from Allah the Mighty, besides whom there is no god, the Living, the Sustainer, and I turn to Him in repentance.',
+    reference: 'Sunan Abi Dawud, Sunan al-Tirmidhi',
+  },
+  {
+    title: 'For Ease in Difficulty',
+    arabic: 'اللَّهُمَّ لَا سَهْلَ إِلَّا مَا جَعَلْتَهُ سَهْلًا وَأَنْتَ تَجْعَلُ الْحَزْنَ إِذَا شِئْتَ سَهْلًا',
+    meaning: 'O Allah, nothing is easy except what You make easy, and You make the difficult easy if You will.',
+    reference: 'Sahih Ibn Hibban',
+  },
+  {
+    title: 'Traveling',
+    arabic: 'سُبْحَانَ الَّذِي سَخَّرَ لَنَا هَٰذَا وَمَا كُنَّا لَهُ مُقْرِنِينَ',
+    meaning: 'Glory to Him who has subjected this to us, and we could never have accomplished this by ourselves.',
+    reference: 'Sahih Muslim',
+  },
+];
+
+export interface HadithEntry {
+  narrator: string;
+  text: string;
+  reference: string;
+}
+
+export const HADITHS: HadithEntry[] = [
+  {
+    narrator: 'Umar ibn al-Khattab (RA)',
+    text: 'Actions are judged by intentions, and every person will get the reward according to what they intended.',
+    reference: 'Sahih al-Bukhari & Sahih Muslim',
+  },
+  {
+    narrator: 'Abu Hurairah (RA)',
+    text: 'Whoever believes in Allah and the Last Day should speak good or remain silent.',
+    reference: 'Sahih al-Bukhari & Sahih Muslim',
+  },
+  {
+    narrator: 'Anas ibn Malik (RA)',
+    text: 'None of you truly believes until he wishes for his brother what he wishes for himself.',
+    reference: 'Sahih al-Bukhari & Sahih Muslim',
+  },
+  {
+    narrator: 'Abu Hurairah (RA)',
+    text: 'The strong person is not the one who overcomes others by strength, but the one who controls himself while in anger.',
+    reference: 'Sahih al-Bukhari & Sahih Muslim',
+  },
+  {
+    narrator: "Abdullah ibn 'Amr (RA)",
+    text: 'The best among you are those who have the best manners and character.',
+    reference: 'Sahih al-Bukhari',
+  },
+  {
+    narrator: 'Abu Hurairah (RA)',
+    text: 'Whoever removes a hardship from a believer in this world, Allah will remove from him one of the hardships of the Day of Judgment.',
+    reference: 'Sahih Muslim',
+  },
+];
+
+export interface NamazStep {
+  title: string;
+  steps: string[];
+}
+
+export const NAMAZ_GUIDE: NamazStep[] = [
+  {
+    title: 'Wudu (Ablution)',
+    steps: [
+      'Make the intention (niyyah) to purify yourself for prayer.',
+      'Say "Bismillah" and wash both hands up to the wrists, three times.',
+      'Rinse the mouth three times, then rinse the nose by sniffing water and blowing out, three times.',
+      'Wash the face from hairline to chin, ear to ear, three times.',
+      'Wash the arms up to and including the elbows, right then left, three times.',
+      'Wipe the head once with wet hands, then wipe the ears.',
+      'Wash the feet up to and including the ankles, right then left, three times.',
+    ],
+  },
+  {
+    title: 'Salah (Prayer) — Basic Structure',
+    steps: [
+      'Face the Qiblah and make the intention for the specific prayer.',
+      'Say "Allahu Akbar" (Takbir) to begin, raising the hands to the shoulders or ears.',
+      'Recite Surah Al-Fatiha, followed by another portion of the Quran (in the first two Rak\'ahs).',
+      'Bow (Ruku) saying "Subhana Rabbiyal Adheem," then rise saying "Sami Allahu liman hamidah."',
+      'Prostrate (Sujud) saying "Subhana Rabbiyal A\'la," sit briefly, then prostrate again.',
+      'Repeat the cycle for the required number of Rak\'ahs, sitting for Tashahhud after the second and final Rak\'ah.',
+      'Conclude with Salam, turning the head to the right and then the left.',
+    ],
+  },
+];
+</file>
+
+<file path="src/services/notificationService.ts">
+import { Platform } from 'react-native';
+import { PrayerTimeEntry } from './prayerService';
+import Constants from 'expo-constants';
+
+const isExpoGo = Constants.appOwnership === 'expo';
+
+let Notifications: any = null;
+
+const getNotifications = () => {
+  if (isExpoGo) return null;
+  if (!Notifications) {
+    try {
+      Notifications = require('expo-notifications');
+      Notifications.setNotificationHandler({
+        handleNotification: async () => ({
+          shouldShowAlert: true,
+          shouldPlaySound: true,
+          shouldSetBadge: false,
+          shouldShowBanner: true,
+          shouldShowList: true,
+        }),
+      });
+    } catch (e) {
+      console.log('Notifications are not supported in this environment');
+      return null;
+    }
+  }
+  return Notifications;
+};
+
+export const requestNotificationPermission = async (): Promise<boolean> => {
+  const notif = getNotifications();
+  if (!notif) return false;
+
+  const { status: existing } = await notif.getPermissionsAsync();
+  let final = existing;
+  if (existing !== 'granted') {
+    const { status } = await notif.requestPermissionsAsync();
+    final = status;
+  }
+  if (Platform.OS === 'android') {
+    await notif.setNotificationChannelAsync('azan', {
+      name: 'Azan Reminders',
+      importance: notif.AndroidImportance.HIGH,
+      sound: 'default',
+    });
+  }
+  return final === 'granted';
+};
+
+/**
+ * Cancels any previously scheduled Azan notifications and schedules new
+ * ones for today's remaining prayer times. Call this once per day.
+ */
+export const scheduleAzanNotifications = async (prayerTimes: PrayerTimeEntry[]) => {
+  const notif = getNotifications();
+  if (!notif) {
+    console.log("Cannot schedule notifications in Expo Go");
+    return;
+  }
+
+  const granted = await requestNotificationPermission();
+  if (!granted) return;
+
+  await notif.cancelAllScheduledNotificationsAsync();
+
+  const now = new Date();
+  for (const prayer of prayerTimes) {
+    if (prayer.date.getTime() <= now.getTime()) continue;
+    await notif.scheduleNotificationAsync({
+      content: {
+        title: `${prayer.name} — Time for Prayer`,
+        body: `It's time for ${prayer.name}. May Allah accept your Salah.`,
+        sound: 'default',
+      },
+      trigger: {
+        type: notif.SchedulableTriggerInputTypes.DATE,
+        date: prayer.date,
+      },
+    });
+  }
+};
+</file>
+
+<file path="src/services/prayerService.ts">
+import axios from 'axios';
+import * as Location from 'expo-location';
+
+export interface PrayerTimeEntry {
+  name: string;
+  time: string; // display string, e.g. "05:12 AM"
+  date: Date;   // real Date object for comparisons
+}
+
+const PRAYER_ORDER = ['Fajr', 'Dhuhr', 'Asr', 'Maghrib', 'Isha'];
+
+const to24hDate = (timeStr: string, base: Date): Date => {
+  // Aladhan returns "HH:mm" (24h), sometimes with " (TZ)" suffix
+  const clean = timeStr.split(' ')[0];
+  const [h, m] = clean.split(':').map((n) => parseInt(n, 10));
+  const d = new Date(base);
+  d.setHours(h, m, 0, 0);
+  return d;
+};
+
+const formatDisplay = (d: Date) =>
+  d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+export const getCoords = async (): Promise<{ latitude: number; longitude: number }> => {
+  const { status } = await Location.requestForegroundPermissionsAsync();
+  if (status !== 'granted') {
+    // Fallback to Mecca if permission denied
+    return { latitude: 21.4225, longitude: 39.8262 };
+  }
   try {
-    const userDocRef = doc(db, 'users', userId, 'daily_scores', today);
-    await setDoc(userDocRef, {
-      score: score,
-      lastUpdated: new Date().toISOString()
-    }, { merge: true });
-  } catch (error) {
-    console.error("Error syncing score to Firestore:", error);
+    let location = await Location.getLastKnownPositionAsync({});
+    if (!location) {
+      location = await Location.getCurrentPositionAsync({
+        accuracy: Location.Accuracy.Balanced,
+        timeout: 5000,
+      } as any);
+    }
+    return { latitude: location.coords.latitude, longitude: location.coords.longitude };
+  } catch {
+    return { latitude: 21.4225, longitude: 39.8262 };
   }
 };
 
-export const fetchTodayScoreFromFirestore = async (): Promise<number | null> => {
-  if (!auth.currentUser) return null;
+export const fetchPrayerTimes = async (
+  latitude: number,
+  longitude: number
+): Promise<PrayerTimeEntry[]> => {
+  const response = await axios.get(
+    `https://api.aladhan.com/v1/timings?latitude=${latitude}&longitude=${longitude}&method=2`
+  );
+  const timings = response.data.data.timings;
+  const now = new Date();
 
-  const userId = auth.currentUser.uid;
-  const today = new Date().toISOString().split('T')[0];
-  
-  try {
-    const userDocRef = doc(db, 'users', userId, 'daily_scores', today);
-    const docSnap = await getDoc(userDocRef);
-    
-    if (docSnap.exists()) {
-      return docSnap.data().score;
+  return PRAYER_ORDER.map((name) => {
+    const date = to24hDate(timings[name], now);
+    return { name, time: formatDisplay(date), date };
+  });
+};
+
+/**
+ * Returns the name of the currently "active" prayer window (the most recent
+ * prayer that has passed but the next one hasn't started yet), or null if
+ * before Fajr / data not loaded. Handles the day-wrap for Isha -> Fajr.
+ */
+export const getActivePrayer = (prayerTimes: PrayerTimeEntry[]): string | null => {
+  if (!prayerTimes.length) return null;
+  const now = new Date();
+
+  const sorted = [...prayerTimes].sort((a, b) => a.date.getTime() - b.date.getTime());
+  let active: string | null = null;
+
+  for (const p of sorted) {
+    if (now.getTime() >= p.date.getTime()) {
+      active = p.name;
     }
-  } catch (error) {
-    console.error("Error fetching score from Firestore:", error);
   }
-  
-  return null;
+  // If it's before Fajr today, the active window is still "Isha" (from yesterday)
+  if (active === null) return 'Isha';
+  return active;
+};
+
+/** Minutes remaining until the next prayer. Returns null if unknown. */
+export const getNextPrayer = (
+  prayerTimes: PrayerTimeEntry[]
+): { name: string; minutesLeft: number } | null => {
+  if (!prayerTimes.length) return null;
+  const now = new Date();
+  const sorted = [...prayerTimes].sort((a, b) => a.date.getTime() - b.date.getTime());
+
+  for (const p of sorted) {
+    if (p.date.getTime() > now.getTime()) {
+      const minutesLeft = Math.round((p.date.getTime() - now.getTime()) / 60000);
+      return { name: p.name, minutesLeft };
+    }
+  }
+  // All prayers passed today -> next is tomorrow's Fajr
+  const fajr = sorted[0];
+  const tomorrowFajr = new Date(fajr.date);
+  tomorrowFajr.setDate(tomorrowFajr.getDate() + 1);
+  const minutesLeft = Math.round((tomorrowFajr.getTime() - now.getTime()) / 60000);
+  return { name: 'Fajr', minutesLeft };
 };
 </file>
 
@@ -755,29 +3039,6 @@ Join our community of developers creating universal apps.
 - [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
 </file>
 
-<file path="tsconfig.json">
-{
-  "extends": "expo/tsconfig.base",
-  "compilerOptions": {
-    "strict": true,
-    "paths": {
-      "@/*": [
-        "./src/*"
-      ],
-      "@/assets/*": [
-        "./assets/*"
-      ]
-    }
-  },
-  "include": [
-    "**/*.ts",
-    "**/*.tsx",
-    ".expo/types/**/*.ts",
-    "expo-env.d.ts"
-  ]
-}
-</file>
-
 <file path="src/app/(tabs)/_layout.tsx">
 import { Tabs } from 'expo-router';
 import { Home, Grid, Heart } from 'lucide-react-native';
@@ -825,106 +3086,461 @@ export default function TabLayout() {
 }
 </file>
 
-<file path="src/services/aiService.ts">
-import axios from 'axios';
+<file path="src/components/deenhub/ArticlesScreen.tsx">
+import React, { useEffect, useState } from 'react';
+import { View, Text, StyleSheet, ScrollView, ActivityIndicator, TouchableOpacity, Alert } from 'react-native';
+import { getArticles, seedArticles, Article } from '../../services/dbService';
 
-// Add this to your environment variables later (.env)
-const OPENAI_API_KEY = process.env.EXPO_PUBLIC_OPENAI_API_KEY || '';
-const GEMINI_API_KEY = process.env.EXPO_PUBLIC_GEMINI_API_KEY || '';
+export default function ArticlesScreen() {
+  const [articles, setArticles] = useState<Article[]>([]);
+  const [loading, setLoading] = useState(true);
 
-export const getDailyAISuggestion = async (score: number) => {
-  if (!OPENAI_API_KEY) {
-    // Fallback if no API key is provided
-    return score >= 0
-      ? "Today's suggestion: Give charity, however small."
-      : "Today's must-do: Give Sadaqah, Read 10 Ayahs, Make Istighfar 100 times.";
+  const fetchArticles = async () => {
+    setLoading(true);
+    const data = await getArticles();
+    setArticles(data);
+    setLoading(false);
+  };
+
+  useEffect(() => {
+    fetchArticles();
+  }, []);
+
+  const handleSeed = async () => {
+    setLoading(true);
+    const success = await seedArticles();
+    if (success) {
+      Alert.alert("Success", "Articles have been added to your Firestore database!");
+      fetchArticles(); // Refresh the list
+    } else {
+      Alert.alert("Notice", "Database already has articles, or an error occurred.");
+      setLoading(false);
+    }
+  };
+
+  if (loading) {
+    return (
+      <View style={styles.centerContainer}>
+        <ActivityIndicator size="large" color="#D4AF37" />
+        <Text style={styles.loadingText}>Fetching articles from server...</Text>
+      </View>
+    );
   }
 
-  try {
-    const prompt = score >= 0 
-      ? "The user has a positive Taqwa (piety) score today. Give a short, encouraging 1-sentence Islamic suggestion to do a good deed today."
-      : "The user has a negative Taqwa (piety) score today, meaning they have sinned or missed prayers. Give a short, firm but merciful 1-sentence Islamic suggestion to repent and do specific good deeds today.";
+  return (
+    <ScrollView style={styles.container} contentContainerStyle={styles.content}>
+      <View style={styles.headerRow}>
+        <Text style={styles.pageTitle}>Islamic Articles</Text>
+        {articles.length === 0 && (
+          <TouchableOpacity style={styles.seedBtn} onPress={handleSeed}>
+            <Text style={styles.seedBtnText}>Seed Database</Text>
+          </TouchableOpacity>
+        )}
+      </View>
 
-    const response = await axios.post(
-      'https://api.openai.com/v1/chat/completions',
-      {
-        model: 'gpt-4o-mini',
-        messages: [{ role: 'system', content: prompt }],
-        max_tokens: 50,
-      },
-      {
-        headers: {
-          'Authorization': `Bearer ${OPENAI_API_KEY}`,
-          'Content-Type': 'application/json',
-        },
+      {articles.length === 0 ? (
+        <View style={styles.emptyState}>
+          <Text style={styles.emptyStateText}>No articles found.</Text>
+          <Text style={styles.emptyStateSub}>Click "Seed Database" to populate your Firestore.</Text>
+        </View>
+      ) : (
+        articles.map((article) => (
+          <View key={article.id || article.title} style={styles.card}>
+            <Text style={styles.title}>{article.title}</Text>
+            <View style={styles.metaRow}>
+              <Text style={styles.author}>{article.author}</Text>
+              <Text style={styles.date}>{article.date}</Text>
+            </View>
+            <Text style={styles.body}>{article.content}</Text>
+          </View>
+        ))
+      )}
+    </ScrollView>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: { flex: 1, backgroundColor: '#0F2F20' },
+  content: { padding: 20 },
+  centerContainer: { flex: 1, backgroundColor: '#0F2F20', alignItems: 'center', justifyContent: 'center' },
+  loadingText: { color: '#D4AF37', marginTop: 16, fontWeight: '600' },
+  
+  headerRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 },
+  pageTitle: { color: '#A0A0A0', fontSize: 14, fontStyle: 'italic' },
+  seedBtn: { backgroundColor: '#E74C3C', paddingHorizontal: 12, paddingVertical: 6, borderRadius: 8 },
+  seedBtnText: { color: '#FFF', fontSize: 12, fontWeight: 'bold' },
+
+  emptyState: { alignItems: 'center', marginTop: 50 },
+  emptyStateText: { color: '#FFF', fontSize: 18, fontWeight: 'bold', marginBottom: 8 },
+  emptyStateSub: { color: '#A0A0A0', fontSize: 14, textAlign: 'center' },
+
+  card: {
+    backgroundColor: '#1B4332',
+    borderRadius: 16,
+    padding: 20,
+    marginBottom: 20,
+    borderWidth: 1,
+    borderColor: 'rgba(212, 175, 55, 0.1)',
+  },
+  title: { color: '#FFF', fontSize: 20, fontWeight: 'bold', marginBottom: 12, lineHeight: 28 },
+  metaRow: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 16, borderBottomWidth: 1, borderBottomColor: 'rgba(255,255,255,0.05)', paddingBottom: 12 },
+  author: { color: '#D4AF37', fontSize: 12, fontWeight: '600' },
+  date: { color: '#A0A0A0', fontSize: 12 },
+  body: { color: '#FFF', fontSize: 15, lineHeight: 24, opacity: 0.9 },
+});
+</file>
+
+<file path="src/components/deenhub/QuizScreen.tsx">
+import React, { useState, useEffect } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, ActivityIndicator } from 'react-native';
+import { generateQuizQuestions, QuizQuestion } from '../../services/aiService';
+
+export default function QuizScreen() {
+  const [questions, setQuestions] = useState<QuizQuestion[]>([]);
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [score, setScore] = useState(0);
+  const [showResult, setShowResult] = useState(false);
+  const [selectedOption, setSelectedOption] = useState<number | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  const fetchQuestions = async () => {
+    setLoading(true);
+    setShowResult(false);
+    setCurrentIndex(0);
+    setScore(0);
+    setSelectedOption(null);
+    
+    // Generate 5 new questions using Gemini AI
+    const generated = await generateQuizQuestions(5);
+    setQuestions(generated);
+    setLoading(false);
+  };
+
+  // Fetch questions on mount
+  useEffect(() => {
+    fetchQuestions();
+  }, []);
+
+  const handleSelect = (index: number) => {
+    if (selectedOption !== null) return;
+    setSelectedOption(index);
+    if (index === questions[currentIndex].answer) {
+      setScore(score + 1);
+    }
+    setTimeout(() => {
+      if (currentIndex < questions.length - 1) {
+        setCurrentIndex(currentIndex + 1);
+        setSelectedOption(null);
+      } else {
+        setShowResult(true);
       }
-    );
+    }, 1500); // 1.5 seconds delay so they can read the right answer
+  };
 
-    return response.data.choices[0].message.content.trim();
+  if (loading) {
+    return (
+      <View style={styles.centered}>
+        <ActivityIndicator size="large" color="#D4AF37" />
+        <Text style={styles.loadingText}>Gemini AI is generating new questions...</Text>
+      </View>
+    );
+  }
+
+  if (showResult || questions.length === 0) {
+    return (
+      <View style={styles.centered}>
+        <Text style={styles.resultTitle}>Quiz Completed!</Text>
+        <Text style={styles.scoreText}>Your Score: {score} / {questions.length}</Text>
+        <TouchableOpacity style={styles.button} onPress={fetchQuestions}>
+          <Text style={styles.buttonText}>Generate New Quiz</Text>
+        </TouchableOpacity>
+      </View>
+    );
+  }
+
+  const q = questions[currentIndex];
+
+  return (
+    <ScrollView style={styles.container} contentContainerStyle={styles.content}>
+      <Text style={styles.aiBadge}>✨ Powered by Gemini AI</Text>
+      <Text style={styles.progress}>Question {currentIndex + 1} of {questions.length}</Text>
+      <Text style={styles.question}>{q.question}</Text>
+
+      {q.options.map((opt, idx) => {
+        let bgColor = '#1B4332';
+        let borderColor = 'rgba(212, 175, 55, 0.2)';
+        
+        if (selectedOption !== null) {
+          if (idx === q.answer) {
+            bgColor = 'rgba(46, 204, 113, 0.2)';
+            borderColor = '#2ECC71';
+          } else if (idx === selectedOption) {
+            bgColor = 'rgba(231, 76, 60, 0.2)';
+            borderColor = '#E74C3C';
+          }
+        }
+
+        return (
+          <TouchableOpacity
+            key={idx}
+            style={[styles.option, { backgroundColor: bgColor, borderColor }]}
+            onPress={() => handleSelect(idx)}
+            activeOpacity={0.8}
+            disabled={selectedOption !== null}
+          >
+            <Text style={styles.optionText}>{opt}</Text>
+          </TouchableOpacity>
+        );
+      })}
+    </ScrollView>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: { flex: 1, backgroundColor: '#0F2F20' },
+  content: { padding: 20 },
+  centered: { flex: 1, justifyContent: 'center', alignItems: 'center', padding: 20, backgroundColor: '#0F2F20' },
+  loadingText: { color: '#D4AF37', marginTop: 16, fontWeight: '600' },
+  aiBadge: { color: '#A0A0A0', fontSize: 12, textAlign: 'center', marginBottom: 10, fontStyle: 'italic' },
+  progress: { color: '#D4AF37', fontSize: 14, fontWeight: '600', marginBottom: 20, textAlign: 'center' },
+  question: { color: '#FFF', fontSize: 22, fontWeight: 'bold', marginBottom: 30, textAlign: 'center', lineHeight: 32 },
+  option: {
+    padding: 18,
+    borderRadius: 12,
+    borderWidth: 1,
+    marginBottom: 16,
+    alignItems: 'center',
+  },
+  optionText: { color: '#FFF', fontSize: 16, fontWeight: '500' },
+  resultTitle: { color: '#D4AF37', fontSize: 28, fontWeight: 'bold', marginBottom: 10 },
+  scoreText: { color: '#FFF', fontSize: 20, marginBottom: 40 },
+  button: { backgroundColor: '#D4AF37', paddingHorizontal: 32, paddingVertical: 14, borderRadius: 30 },
+  buttonText: { color: '#0F2F20', fontSize: 16, fontWeight: 'bold' },
+});
+</file>
+
+<file path="src/components/deenhub/QuranLearningScreen.tsx">
+import React from 'react';
+import { View, Text, StyleSheet, ScrollView } from 'react-native';
+
+const ALPHABET_GROUPS = [
+  {
+    title: 'The Empty Space (Al-Jawf)',
+    desc: 'The empty space in the mouth and throat. Produces the 3 long vowel sounds.',
+    letters: [
+      { id: '1', ar: 'ا', en: 'Alif Maddah', tip: 'Prolonged \'A\' sound' },
+      { id: '2', ar: 'و', en: 'Waw Maddah', tip: 'Prolonged \'U\' sound' },
+      { id: '3', ar: 'ي', en: 'Ya Maddah', tip: 'Prolonged \'I\' sound' },
+    ]
+  },
+  {
+    title: 'The Throat (Al-Halq)',
+    desc: 'These 6 letters are pronounced from three different parts of the throat.',
+    letters: [
+      { id: '4', ar: 'ء', en: 'Hamzah', tip: 'Bottom of the throat' },
+      { id: '5', ar: 'ه', en: 'Ha', tip: 'Bottom of the throat' },
+      { id: '6', ar: 'ع', en: '\'Ayn', tip: 'Middle of the throat' },
+      { id: '7', ar: 'ح', en: 'Haa', tip: 'Middle of the throat (sharp)' },
+      { id: '8', ar: 'غ', en: 'Ghayn', tip: 'Top of the throat' },
+      { id: '9', ar: 'خ', en: 'Kha', tip: 'Top of the throat' },
+    ]
+  },
+  {
+    title: 'The Tongue (Al-Lisan)',
+    desc: 'The largest articulation point, producing 18 letters from various parts of the tongue touching the palate or teeth.',
+    letters: [
+      { id: '10', ar: 'ق', en: 'Qaf', tip: 'Back of tongue touching soft palate' },
+      { id: '11', ar: 'ك', en: 'Kaf', tip: 'Back of tongue touching hard palate' },
+      { id: '12', ar: 'ج', en: 'Jeem', tip: 'Middle of tongue to hard palate' },
+      { id: '13', ar: 'ش', en: 'Sheen', tip: 'Middle of tongue to hard palate' },
+      { id: '14', ar: 'ي', en: 'Ya (Consonant)', tip: 'Middle of tongue to hard palate' },
+      { id: '15', ar: 'ض', en: 'Daad', tip: 'Edge of tongue to upper molars' },
+      { id: '16', ar: 'ل', en: 'Lam', tip: 'Tip of tongue to front gums' },
+      { id: '17', ar: 'ن', en: 'Noon', tip: 'Tip of tongue to front gums' },
+      { id: '18', ar: 'ر', en: 'Ra', tip: 'Tip of tongue to front gums (with slight trill)' },
+      { id: '19', ar: 'ط', en: 'Taa', tip: 'Tip of tongue to roots of upper incisors' },
+      { id: '20', ar: 'د', en: 'Dal', tip: 'Tip of tongue to roots of upper incisors' },
+      { id: '21', ar: 'ت', en: 'Ta', tip: 'Tip of tongue to roots of upper incisors' },
+      { id: '22', ar: 'ص', en: 'Saad', tip: 'Tip of tongue approaching lower incisors' },
+      { id: '23', ar: 'س', en: 'Seen', tip: 'Tip of tongue approaching lower incisors' },
+      { id: '24', ar: 'ز', en: 'Zay', tip: 'Tip of tongue approaching lower incisors' },
+      { id: '25', ar: 'ظ', en: 'Dhaa', tip: 'Tip of tongue to edges of upper incisors' },
+      { id: '26', ar: 'ذ', en: 'Thal', tip: 'Tip of tongue to edges of upper incisors' },
+      { id: '27', ar: 'ث', en: 'Tha', tip: 'Tip of tongue to edges of upper incisors' },
+    ]
+  },
+  {
+    title: 'The Lips (Ash-Shatan)',
+    desc: 'These 4 letters are pronounced using the lips.',
+    letters: [
+      { id: '28', ar: 'ف', en: 'Fa', tip: 'Upper incisors to lower lip' },
+      { id: '29', ar: 'و', en: 'Waw (Consonant)', tip: 'Rounding both lips' },
+      { id: '30', ar: 'ب', en: 'Ba', tip: 'Closing both lips firmly' },
+      { id: '31', ar: 'م', en: 'Meem', tip: 'Closing both lips (with nasal sound)' },
+    ]
+  }
+];
+
+export default function QuranLearningScreen() {
+  return (
+    <ScrollView style={styles.container} contentContainerStyle={styles.content}>
+      <View style={styles.introBox}>
+        <Text style={styles.sectionTitle}>Makharij Al-Huroof</Text>
+        <Text style={styles.description}>
+          Tajweed refers to the rules governing pronunciation during recitation of the Quran. 
+          The core of Tajweed is understanding "Makharij" (the emission points of the letters).
+          There are 5 main articulation points that produce the 28 Arabic letters.
+        </Text>
+      </View>
+
+      {ALPHABET_GROUPS.map((group, index) => (
+        <View key={index} style={styles.groupContainer}>
+          <Text style={styles.groupTitle}>{group.title}</Text>
+          <Text style={styles.groupDesc}>{group.desc}</Text>
+          
+          <View style={styles.grid}>
+            {group.letters.map((letter) => (
+              <View key={letter.id} style={styles.card}>
+                <Text style={styles.arabicText}>{letter.ar}</Text>
+                <Text style={styles.englishText}>{letter.en}</Text>
+                <Text style={styles.tipText}>{letter.tip}</Text>
+              </View>
+            ))}
+          </View>
+        </View>
+      ))}
+    </ScrollView>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: { flex: 1, backgroundColor: '#0F2F20' },
+  content: { padding: 20 },
+  introBox: { marginBottom: 24 },
+  sectionTitle: { color: '#D4AF37', fontSize: 24, fontWeight: 'bold', marginBottom: 12 },
+  description: { color: '#A0A0A0', fontSize: 14, lineHeight: 22 },
+  
+  groupContainer: { marginBottom: 32 },
+  groupTitle: { color: '#FFF', fontSize: 20, fontWeight: 'bold', marginBottom: 6, borderBottomWidth: 1, borderBottomColor: 'rgba(212, 175, 55, 0.2)', paddingBottom: 8 },
+  groupDesc: { color: '#A0A0A0', fontSize: 13, marginBottom: 16, fontStyle: 'italic' },
+  
+  grid: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between' },
+  card: {
+    backgroundColor: '#1B4332',
+    width: '48%',
+    padding: 16,
+    borderRadius: 12,
+    marginBottom: 16,
+    borderWidth: 1,
+    borderColor: 'rgba(212, 175, 55, 0.15)',
+    alignItems: 'center',
+  },
+  arabicText: { color: '#FFF', fontSize: 40, fontWeight: 'bold', marginBottom: 8 },
+  englishText: { color: '#D4AF37', fontSize: 15, fontWeight: '600', marginBottom: 8 },
+  tipText: { color: '#A0A0A0', fontSize: 11, textAlign: 'center', lineHeight: 16 },
+});
+</file>
+
+<file path="src/services/dbService.ts">
+import { doc, setDoc, getDoc, collection, getDocs, addDoc } from 'firebase/firestore';
+import { db, auth } from './firebase';
+
+export const syncScoreToFirestore = async (score: number) => {
+  if (!auth.currentUser) return;
+  
+  const userId = auth.currentUser.uid;
+  const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
+  
+  try {
+    const userDocRef = doc(db, 'users', userId, 'daily_scores', today);
+    await setDoc(userDocRef, {
+      score: score,
+      lastUpdated: new Date().toISOString()
+    }, { merge: true });
   } catch (error) {
-    console.error("AI Service Error:", error);
-    return "Make Istighfar and renew your intentions today.";
+    console.error("Error syncing score to Firestore:", error);
   }
 };
 
-export interface DeedEvaluation {
-  type: 'good' | 'bad';
-  points: number;
-  reference: string;
+export const fetchTodayScoreFromFirestore = async (): Promise<number | null> => {
+  if (!auth.currentUser) return null;
+
+  const userId = auth.currentUser.uid;
+  const today = new Date().toISOString().split('T')[0];
+  
+  try {
+    const userDocRef = doc(db, 'users', userId, 'daily_scores', today);
+    const docSnap = await getDoc(userDocRef);
+    
+    if (docSnap.exists()) {
+      return docSnap.data().score;
+    }
+  } catch (error) {
+    console.error("Error fetching score from Firestore:", error);
+  }
+  
+  return null;
+};
+
+export interface Article {
+  id?: string;
+  title: string;
+  author: string;
+  date: string;
+  content: string;
 }
 
-export const evaluateDeedWithGemini = async (userDeed: string): Promise<DeedEvaluation> => {
-  if (!GEMINI_API_KEY) {
-    // Fallback if no API key is provided
-    return {
-      type: 'good',
-      points: 10,
-      reference: 'Please add your Gemini API Key in .env to get AI evaluations.'
-    };
+export const getArticles = async (): Promise<Article[]> => {
+  try {
+    const articlesCol = collection(db, 'articles');
+    const articleSnapshot = await getDocs(articlesCol);
+    const articleList = articleSnapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data()
+    } as Article));
+    return articleList;
+  } catch (error) {
+    console.error("Error fetching articles:", error);
+    return [];
   }
+};
+
+export const seedArticles = async () => {
+  const INITIAL_ARTICLES = [
+    {
+      title: 'The Power of Gratitude (Shukr)',
+      author: 'Takwa Editorial',
+      date: 'Oct 15',
+      content: 'Gratitude in Islam is not just a feeling, but a state of being. Allah says in the Quran: "If you are grateful, I will surely increase you [in favor]" (14:7). True Shukr involves recognizing the blessing in your heart, speaking of it with your tongue, and using it in ways that please the Creator.',
+    },
+    {
+      title: 'Understanding Sabr',
+      author: 'Takwa Editorial',
+      date: 'Oct 12',
+      content: 'Sabr is often translated as patience, but it encompasses perseverance, endurance, and restraint. It is divided into three categories: patience in obeying Allah, patience in abstaining from sins, and patience during times of calamity. The Prophet (SAW) said, "And whoever remains patient, Allah will make him patient. Nobody can be given a blessing better and greater than patience." (Bukhari)',
+    },
+    {
+      title: 'The Importance of Good Character',
+      author: 'Takwa Editorial',
+      date: 'Oct 05',
+      content: 'The Prophet Muhammad (SAW) was sent to perfect good character. He said, "The most perfect of the believers in faith are the best of them in moral character." (Tirmidhi). Good character involves treating others with respect, honesty, and kindness, regardless of their background or status.',
+    },
+  ];
 
   try {
-    const prompt = `
-      You are an Islamic assistant. The user has logged a daily activity: "${userDeed}".
-      Evaluate this activity based on Islamic teachings.
-      1. Determine if it is a good deed (good) or a sin/bad deed (bad).
-      2. Assign points from 10 to 200. Good deeds should be positive points, sins should be positive points that will be subtracted later (just return a positive absolute number).
-      3. Provide a short, inspiring Quranic verse or Hadith reference relating to this action (max 2 sentences).
-      
-      You must respond strictly in JSON format without any markdown wrappers or code blocks.
-      Example format:
-      {
-        "type": "good",
-        "points": 50,
-        "reference": "Allah multiplies the reward of charity from 70 to 700 times! (Quran 2:261)"
+    const articlesCol = collection(db, 'articles');
+    // Check if empty first
+    const snapshot = await getDocs(articlesCol);
+    if (snapshot.empty) {
+      for (const article of INITIAL_ARTICLES) {
+        await addDoc(articlesCol, article);
       }
-    `;
-
-    const response = await axios.post(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY}`,
-      {
-        contents: [{ parts: [{ text: prompt }] }],
-        generationConfig: {
-          responseMimeType: "application/json",
-        }
-      },
-      {
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      }
-    );
-
-    const textResult = response.data.candidates[0].content.parts[0].text;
-    const parsed = JSON.parse(textResult);
-    return parsed as DeedEvaluation;
+      return true; // Successfully seeded
+    }
+    return false; // Already has data
   } catch (error) {
-    console.error("Gemini AI Service Error:", error);
-    return {
-      type: 'good',
-      points: 10,
-      reference: 'Error connecting to AI. May Allah reward your intention.'
-    };
+    console.error("Error seeding articles:", error);
+    return false;
   }
 };
 </file>
@@ -943,6 +3559,104 @@ export const store = configureStore({
 
 export type RootState = ReturnType<typeof store.getState>;
 export type AppDispatch = typeof store.dispatch;
+</file>
+
+<file path="tsconfig.json">
+{
+  "extends": "expo/tsconfig.base",
+  "compilerOptions": {
+    "strict": true,
+    "paths": {
+      "@/*": [
+        "./src/*"
+      ],
+      "@/assets/*": [
+        "./assets/*"
+      ]
+    }
+  },
+  "include": [
+    "**/*.ts",
+    "**/*.tsx",
+    ".expo/types/**/*.ts",
+    "expo-env.d.ts"
+  ],
+  "exclude": [
+    "node_modules",
+    "taqwa-updates"
+  ]
+}
+</file>
+
+<file path="src/app/_layout.tsx">
+import { Stack, useRouter, useSegments } from 'expo-router';
+import { PaperProvider } from 'react-native-paper';
+import { Provider as ReduxProvider, useDispatch, useSelector } from 'react-redux';
+import { store, RootState } from '../store/store';
+import { StatusBar } from 'expo-status-bar';
+import { useEffect } from 'react';
+import { View, ActivityIndicator } from 'react-native';
+import { subscribeToAuthChanges } from '../services/firebase';
+import { setUser, clearUser } from '../store/authSlice';
+
+function AuthGate({ children }: { children: React.ReactNode }) {
+  const dispatch = useDispatch();
+  const router = useRouter();
+  const segments = useSegments();
+  const { user, initializing } = useSelector((state: RootState) => state.auth);
+
+  useEffect(() => {
+    const unsubscribe = subscribeToAuthChanges((firebaseUser) => {
+      if (firebaseUser) {
+        dispatch(setUser({
+          uid: firebaseUser.uid,
+          email: firebaseUser.email,
+          displayName: firebaseUser.displayName,
+        }));
+      } else {
+        dispatch(clearUser());
+      }
+    });
+    return unsubscribe;
+  }, []);
+
+  useEffect(() => {
+    if (initializing) return;
+    const inAuthGroup = segments[0] === '(auth)';
+
+    if (!user && !inAuthGroup) {
+      router.replace('/(auth)/login');
+    } else if (user && inAuthGroup) {
+      router.replace('/(tabs)');
+    }
+  }, [user, initializing, segments]);
+
+  if (initializing) {
+    return (
+      <View style={{ flex: 1, backgroundColor: '#0F2F20', alignItems: 'center', justifyContent: 'center' }}>
+        <ActivityIndicator size="large" color="#D4AF37" />
+      </View>
+    );
+  }
+
+  return <>{children}</>;
+}
+
+export default function RootLayout() {
+  return (
+    <ReduxProvider store={store}>
+      <PaperProvider>
+        <AuthGate>
+          <Stack screenOptions={{ headerShown: false }}>
+            <Stack.Screen name="(auth)" />
+            <Stack.Screen name="(tabs)" />
+          </Stack>
+        </AuthGate>
+        <StatusBar style="light" />
+      </PaperProvider>
+    </ReduxProvider>
+  );
+}
 </file>
 
 <file path=".gitignore">
@@ -990,325 +3704,9 @@ example
 # generated native folders
 /ios
 /android
-</file>
 
-<file path="src/app/(tabs)/deen-hub.tsx">
-import React from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, ImageBackground } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { BookOpen, Clock, Book, Heart, MessageCircle, HelpCircle, Video, List, DollarSign, Calendar, Navigation, PlusSquare, BookMarked, MessageSquare } from 'lucide-react-native';
-
-const FEATURES = [
-  { name: 'Tafseer', icon: BookOpen },
-  { name: 'Prayer Times', icon: Clock },
-  { name: 'Quran', icon: Book },
-  { name: 'Dua', icon: Heart },
-  { name: 'Books', icon: BookMarked },
-  { name: 'Hadith', icon: BookOpen },
-  { name: 'Masail', icon: MessageCircle },
-  { name: 'Quiz', icon: HelpCircle },
-  { name: 'Bayan', icon: Video },
-  { name: 'Quran Learning', icon: Book },
-  { name: 'Articles', icon: List },
-  { name: 'Tasbih', icon: PlusSquare },
-  { name: 'Namaz Guide', icon: Navigation },
-  { name: 'Hajj & Umrah', icon: Navigation },
-  { name: 'Roza', icon: Calendar },
-  { name: 'Zakat', icon: DollarSign },
-];
-
-export default function DeenHub() {
-  return (
-    <ImageBackground source={require('../../../assets/images/2nd page.png')} style={styles.backgroundImage}>
-      <SafeAreaView style={styles.container}>
-        <ScrollView contentContainerStyle={styles.scrollContent}>
-        <View style={styles.grid}>
-          {FEATURES.map((feature, index) => {
-            const Icon = feature.icon;
-            return (
-              <TouchableOpacity key={index} style={styles.card}>
-                <Icon color="#D4AF37" size={32} />
-                <Text style={styles.cardText} numberOfLines={2}>
-                  {feature.name}
-                </Text>
-              </TouchableOpacity>
-            );
-          })}
-        </View>
-      </ScrollView>
-    </SafeAreaView>
-  </ImageBackground>
-  );
-}
-
-const styles = StyleSheet.create({
-  backgroundImage: {
-    flex: 1,
-    resizeMode: 'cover',
-  },
-  container: {
-    flex: 1,
-    backgroundColor: 'transparent',
-  },
-  scrollContent: {
-    padding: 15,
-    marginTop: 20,
-  },
-  grid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'space-between',
-  },
-  card: {
-    width: '23%', // 4 items per row approximately
-    aspectRatio: 0.8,
-    backgroundColor: '#1B4332',
-    borderRadius: 12,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: 15,
-    padding: 10,
-    borderWidth: 1,
-    borderColor: 'rgba(212, 175, 55, 0.3)',
-  },
-  cardText: {
-    color: '#D4AF37',
-    fontSize: 12,
-    marginTop: 8,
-    textAlign: 'center',
-  },
-});
-</file>
-
-<file path="src/app/(tabs)/index.tsx">
-import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, ActivityIndicator, ImageBackground } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { Moon, Bell, Sun } from 'lucide-react-native';
-import * as Location from 'expo-location';
-import axios from 'axios';
-
-interface PrayerTime {
-  name: string;
-  time: string;
-  icon: any;
-}
-
-export default function Home() {
-  const [currentTime, setCurrentTime] = useState(new Date());
-  const [prayerTimes, setPrayerTimes] = useState<PrayerTime[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [locationError, setLocationError] = useState<string | null>(null);
-
-  // Time updater
-  useEffect(() => {
-    const timer = setInterval(() => setCurrentTime(new Date()), 1000);
-    return () => clearInterval(timer);
-  }, []);
-
-  // Fetch location and prayer times
-  useEffect(() => {
-    (async () => {
-      try {
-        let { status } = await Location.requestForegroundPermissionsAsync();
-        if (status !== 'granted') {
-          setLocationError('Permission to access location was denied');
-          setLoading(false);
-          return;
-        }
-
-        let location = await Location.getLastKnownPositionAsync({});
-        if (!location) {
-          try {
-            location = await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Balanced, timeout: 5000 });
-          } catch (error) {
-            console.warn("Could not get exact location, using fallback (Mecca). Error:", error);
-            // Fallback to Mecca
-            location = { coords: { latitude: 21.4225, longitude: 39.8262 } } as any;
-          }
-        }
-        const { latitude, longitude } = location.coords;
-        
-        // Fetch from Aladhan API
-        const response = await axios.get(
-          `http://api.aladhan.com/v1/timings?latitude=${latitude}&longitude=${longitude}&method=2`
-        );
-        
-        const timings = response.data.data.timings;
-        
-        // Format to 12-hour string (basic implementation)
-        const formatApiTime = (timeStr: string) => {
-          const [h, m] = timeStr.split(':');
-          const date = new Date();
-          date.setHours(parseInt(h, 10));
-          date.setMinutes(parseInt(m, 10));
-          return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-        };
-
-        const fetchedTimes: PrayerTime[] = [
-          { name: 'Fajr', time: formatApiTime(timings.Fajr), icon: Sun },
-          { name: 'Dhuhr', time: formatApiTime(timings.Dhuhr), icon: Sun },
-          { name: 'Asr', time: formatApiTime(timings.Asr), icon: Sun },
-          { name: 'Maghrib', time: formatApiTime(timings.Maghrib), icon: Moon },
-          { name: 'Isha', time: formatApiTime(timings.Isha), icon: Moon },
-        ];
-        
-        setPrayerTimes(fetchedTimes);
-      } catch (err) {
-        console.error("Error fetching prayer times:", err);
-        setLocationError('Failed to load prayer times');
-      } finally {
-        setLoading(false);
-      }
-    })();
-  }, []);
-
-  const formatTime = (date: Date) => {
-    return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-  };
-
-  // Determine active prayer (simplistic approach based on current time)
-  const getActivePrayer = () => {
-    if (!prayerTimes.length) return null;
-    // Real implementation would compare parsed Date objects.
-    // We will just highlight Maghrib for demonstration purposes based on the mock.
-    return 'Maghrib';
-  };
-
-  const activePrayerName = getActivePrayer();
-
-  return (
-    <ImageBackground source={require('../../../assets/images/homepage.png')} style={styles.backgroundImage}>
-      <SafeAreaView style={styles.container}>
-        <View style={styles.header}>
-        <View style={styles.logoContainer}>
-          <Moon color="#D4AF37" size={32} />
-          <Text style={styles.appName}>Takwa</Text>
-        </View>
-        <TouchableOpacity>
-          <Bell color="#D4AF37" size={24} />
-          <Text style={styles.bellText}>Azan</Text>
-        </TouchableOpacity>
-      </View>
-
-      <View style={styles.clockContainer}>
-        <Text style={styles.clockText}>{formatTime(currentTime)}</Text>
-      </View>
-
-      <ScrollView contentContainerStyle={styles.prayerCardsContainer}>
-        {loading ? (
-          <ActivityIndicator size="large" color="#D4AF37" />
-        ) : locationError ? (
-          <Text style={styles.errorText}>{locationError}</Text>
-        ) : (
-          <View style={styles.grid}>
-            {prayerTimes.map((prayer) => {
-              const Icon = prayer.icon;
-              const isActive = prayer.name === activePrayerName;
-              
-              return (
-                <View 
-                  key={prayer.name} 
-                  style={[
-                    styles.prayerCard,
-                    isActive && styles.activePrayerCard
-                  ]}
-                >
-                  <Icon color={isActive ? '#D4AF37' : '#FFFFFF'} size={32} />
-                  <Text style={[styles.prayerName, isActive && styles.activeText]}>{prayer.name}</Text>
-                  <Text style={[styles.prayerTime, isActive && styles.activeText]}>{prayer.time}</Text>
-                </View>
-              );
-            })}
-          </View>
-        )}
-      </ScrollView>
-    </SafeAreaView>
-  </ImageBackground>
-  );
-}
-
-const styles = StyleSheet.create({
-  backgroundImage: {
-    flex: 1,
-    resizeMode: 'cover',
-  },
-  container: {
-    flex: 1,
-    backgroundColor: 'transparent',
-  },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    padding: 20,
-    marginTop: 20,
-  },
-  logoContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  appName: {
-    color: '#D4AF37',
-    fontSize: 28,
-    fontWeight: 'bold',
-    marginLeft: 10,
-  },
-  bellText: {
-    color: '#D4AF37',
-    fontSize: 12,
-    marginTop: 4,
-  },
-  clockContainer: {
-    alignItems: 'center',
-    marginVertical: 40,
-  },
-  clockText: {
-    color: '#FFFFFF',
-    fontSize: 64,
-    fontWeight: 'bold',
-  },
-  prayerCardsContainer: {
-    paddingHorizontal: 20,
-  },
-  grid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'space-between',
-  },
-  prayerCard: {
-    width: '48%',
-    backgroundColor: '#1B4332',
-    padding: 20,
-    borderRadius: 16,
-    alignItems: 'center',
-    marginBottom: 15,
-  },
-  activePrayerCard: {
-    backgroundColor: '#1B4332',
-    borderColor: '#D4AF37',
-    borderWidth: 2,
-  },
-  prayerName: {
-    color: '#FFFFFF',
-    fontSize: 18,
-    fontWeight: '600',
-    marginTop: 10,
-  },
-  prayerTime: {
-    color: '#A0A0A0',
-    fontSize: 14,
-    marginTop: 5,
-  },
-  activeText: {
-    color: '#D4AF37',
-  },
-  errorText: {
-    color: '#FF4444',
-    textAlign: 'center',
-    marginTop: 20,
-  }
-});
+# Updates
+taqwa-updates/
 </file>
 
 <file path="src/app/(tabs)/taqwa.tsx">
@@ -1319,7 +3717,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from '../../store/store';
 import { addDeed, addSin, setScore } from '../../store/taqwaSlice';
 import { Check, AlertTriangle, Book } from 'lucide-react-native';
-import LottieView from 'lottie-react-native';
+import AmbientGlow from '../../components/AmbientGlow';
 import { getDailyAISuggestion, evaluateDeedWithGemini } from '../../services/aiService';
 import { syncScoreToFirestore, fetchTodayScoreFromFirestore } from '../../services/dbService';
 import { auth } from '../../services/firebase';
@@ -1403,16 +3801,8 @@ export default function Taqwa() {
   return (
     <ImageBackground source={require('../../../assets/images/3rd  page.png')} style={styles.backgroundImage}>
       <SafeAreaView style={[styles.container, isPositive ? styles.positiveBg : styles.negativeBg]}>
-      {/* Background Lottie Animation */}
-      <View style={StyleSheet.absoluteFill} pointerEvents="none">
-        <LottieView
-          source={isPositive ? require('../../../assets/garden.json') : require('../../../assets/fire.json')}
-          autoPlay
-          loop
-          style={styles.lottieBackground}
-          resizeMode="cover"
-        />
-      </View>
+      {/* Ambient background glow (Jannat = green, Istighfar = red/orange) */}
+      <AmbientGlow mode={isPositive ? 'positive' : 'negative'} />
 
       <ScrollView contentContainerStyle={styles.scrollContent}>
         
@@ -1528,11 +3918,6 @@ const styles = StyleSheet.create({
   },
   negativeBg: {
     backgroundColor: 'rgba(48, 0, 0, 0.5)',
-  },
-  lottieBackground: {
-    width: '100%',
-    height: '100%',
-    opacity: 0.3, // Semi-transparent so text is readable
   },
   scrollContent: {
     padding: 20,
@@ -1704,75 +4089,204 @@ const styles = StyleSheet.create({
 });
 </file>
 
-<file path="src/app/_layout.tsx">
-import { Stack, useRouter, useSegments } from 'expo-router';
-import { PaperProvider } from 'react-native-paper';
-import { Provider as ReduxProvider, useDispatch, useSelector } from 'react-redux';
-import { store, RootState } from '../store/store';
-import { StatusBar } from 'expo-status-bar';
-import { useEffect } from 'react';
-import { View, ActivityIndicator } from 'react-native';
-import { subscribeToAuthChanges } from '../services/firebase';
-import { setUser, clearUser } from '../store/authSlice';
+<file path="src/services/aiService.ts">
+import axios from 'axios';
 
-function AuthGate({ children }: { children: React.ReactNode }) {
-  const dispatch = useDispatch();
-  const router = useRouter();
-  const segments = useSegments();
-  const { user, initializing } = useSelector((state: RootState) => state.auth);
+// Add this to your environment variables later (.env)
+const OPENAI_API_KEY = process.env.EXPO_PUBLIC_OPENAI_API_KEY || '';
+const GEMINI_API_KEY = process.env.EXPO_PUBLIC_GEMINI_API_KEY || '';
 
-  useEffect(() => {
-    const unsubscribe = subscribeToAuthChanges((firebaseUser) => {
-      if (firebaseUser) {
-        dispatch(setUser({
-          uid: firebaseUser.uid,
-          email: firebaseUser.email,
-          displayName: firebaseUser.displayName,
-        }));
-      } else {
-        dispatch(clearUser());
-      }
-    });
-    return unsubscribe;
-  }, []);
-
-  useEffect(() => {
-    if (initializing) return;
-    const inAuthGroup = segments[0] === '(auth)';
-
-    if (!user && !inAuthGroup) {
-      router.replace('/(auth)/login');
-    } else if (user && inAuthGroup) {
-      router.replace('/(tabs)');
-    }
-  }, [user, initializing, segments]);
-
-  if (initializing) {
-    return (
-      <View style={{ flex: 1, backgroundColor: '#0F2F20', alignItems: 'center', justifyContent: 'center' }}>
-        <ActivityIndicator size="large" color="#D4AF37" />
-      </View>
-    );
+export const getDailyAISuggestion = async (score: number) => {
+  if (!OPENAI_API_KEY) {
+    // Fallback if no API key is provided
+    return score >= 0
+      ? "Today's suggestion: Give charity, however small."
+      : "Today's must-do: Give Sadaqah, Read 10 Ayahs, Make Istighfar 100 times.";
   }
 
-  return <>{children}</>;
+  try {
+    const prompt = score >= 0 
+      ? "The user has a positive Taqwa (piety) score today. Give a short, encouraging 1-sentence Islamic suggestion to do a good deed today."
+      : "The user has a negative Taqwa (piety) score today, meaning they have sinned or missed prayers. Give a short, firm but merciful 1-sentence Islamic suggestion to repent and do specific good deeds today.";
+
+    const response = await axios.post(
+      'https://api.openai.com/v1/chat/completions',
+      {
+        model: 'gpt-4o-mini',
+        messages: [{ role: 'system', content: prompt }],
+        max_tokens: 50,
+      },
+      {
+        headers: {
+          'Authorization': `Bearer ${OPENAI_API_KEY}`,
+          'Content-Type': 'application/json',
+        },
+      }
+    );
+
+    return response.data.choices[0].message.content.trim();
+  } catch (error) {
+    console.error("AI Service Error:", error);
+    return "Make Istighfar and renew your intentions today.";
+  }
+};
+
+export const askMasailBot = async (question: string): Promise<string> => {
+  if (!GEMINI_API_KEY) {
+    return 'Please add your Gemini API Key in .env to enable the Masail chatbot.';
+  }
+
+  try {
+    const prompt = `
+      You are "Masail", a knowledgeable and humble Islamic assistant embedded in the Takwa app.
+      Answer the user's everyday Fiqh / Islamic question below, in whichever language they asked
+      in (English or Bangla). Keep the answer concise (3-6 sentences), practical, and where
+      relevant mention that different schools of thought (madhahib) may differ and recommend
+      consulting a local scholar for rulings with significant personal consequences.
+      Do not fabricate Quran verse numbers or Hadith references you are not confident about;
+      speak in general terms if unsure.
+
+      Question: "${question}"
+    `;
+
+    const response = await axios.post(
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY}`,
+      { contents: [{ parts: [{ text: prompt }] }] },
+      { headers: { 'Content-Type': 'application/json' } }
+    );
+
+    return response.data.candidates[0].content.parts[0].text.trim();
+  } catch (error) {
+    console.error('Masail bot error:', error);
+    return "I couldn't reach the AI service right now. Please try again in a moment.";
+  }
+};
+
+export interface DeedEvaluation {
+  type: 'good' | 'bad';
+  points: number;
+  reference: string;
 }
 
-export default function RootLayout() {
-  return (
-    <ReduxProvider store={store}>
-      <PaperProvider>
-        <AuthGate>
-          <Stack screenOptions={{ headerShown: false }}>
-            <Stack.Screen name="(auth)" />
-            <Stack.Screen name="(tabs)" />
-          </Stack>
-        </AuthGate>
-        <StatusBar style="light" />
-      </PaperProvider>
-    </ReduxProvider>
-  );
+export const evaluateDeedWithGemini = async (userDeed: string): Promise<DeedEvaluation> => {
+  if (!GEMINI_API_KEY) {
+    // Fallback if no API key is provided
+    return {
+      type: 'good',
+      points: 10,
+      reference: 'Please add your Gemini API Key in .env to get AI evaluations.'
+    };
+  }
+
+  try {
+    const prompt = `
+      You are an Islamic assistant. The user has logged a daily activity: "${userDeed}".
+      Evaluate this activity based on Islamic teachings.
+      1. Determine if it is a good deed (good) or a sin/bad deed (bad).
+      2. Assign points from 10 to 200. Good deeds should be positive points, sins should be positive points that will be subtracted later (just return a positive absolute number).
+      3. Provide a short, inspiring Quranic verse or Hadith reference relating to this action (max 2 sentences).
+      
+      You must respond strictly in JSON format without any markdown wrappers or code blocks.
+      Example format:
+      {
+        "type": "good",
+        "points": 50,
+        "reference": "Allah multiplies the reward of charity from 70 to 700 times! (Quran 2:261)"
+      }
+    `;
+
+    const response = await axios.post(
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY}`,
+      {
+        contents: [{ parts: [{ text: prompt }] }],
+        generationConfig: {
+          responseMimeType: "application/json",
+        }
+      },
+      {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      }
+    );
+
+    const textResult = response.data.candidates[0].content.parts[0].text;
+    const parsed = JSON.parse(textResult);
+    return parsed as DeedEvaluation;
+  } catch (error) {
+    console.error("Gemini AI Service Error:", error);
+    return {
+      type: 'good',
+      points: 10,
+      reference: 'Error connecting to AI. May Allah reward your intention.'
+    };
+  }
+};
+
+export interface QuizQuestion {
+  question: string;
+  options: string[];
+  answer: number;
 }
+
+export const generateQuizQuestions = async (count: number = 5): Promise<QuizQuestion[]> => {
+  if (!GEMINI_API_KEY) {
+    // Fallback if no API key
+    return [
+      {
+        question: 'Please add your Gemini API Key in .env to enable AI Quiz Generation.',
+        options: ['Ok', 'Will do', 'Understood', 'Got it'],
+        answer: 0,
+      }
+    ];
+  }
+
+  try {
+    const prompt = `
+      You are an Islamic scholar and quiz master. Generate ${count} random, engaging, and accurate multiple-choice questions about Islam (Quran, Seerah, Prophets, Fiqh, Islamic History).
+      Each question must have exactly 4 options.
+      The 'answer' field must be the 0-indexed integer of the correct option (0, 1, 2, or 3).
+      
+      You must respond strictly in JSON format as an array of objects, without any markdown wrappers or code blocks.
+      Example format:
+      [
+        {
+          "question": "How many Surahs are in the Quran?",
+          "options": ["112", "114", "120", "100"],
+          "answer": 1
+        }
+      ]
+    `;
+
+    const response = await axios.post(
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY}`,
+      {
+        contents: [{ parts: [{ text: prompt }] }],
+        generationConfig: {
+          responseMimeType: "application/json",
+        }
+      },
+      {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      }
+    );
+
+    const textResult = response.data.candidates[0].content.parts[0].text;
+    const parsed = JSON.parse(textResult);
+    return parsed as QuizQuestion[];
+  } catch (error) {
+    console.error("Gemini AI Quiz Error:", error);
+    return [
+      {
+        question: 'Failed to generate questions. Please check your internet or API key.',
+        options: ['Try Again', 'Retry', 'Cancel', 'Exit'],
+        answer: 0,
+      }
+    ];
+  }
+};
 </file>
 
 <file path="src/services/firebase.ts">
@@ -1804,10 +4318,21 @@ const firebaseConfig = {
 const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApp();
 
 // Web needs getAuth; native needs initializeAuth + AsyncStorage persistence
-export const auth =
-  Platform.OS === 'web'
-    ? getAuth(app)
-    : initializeAuth(app, { persistence: getReactNativePersistence(AsyncStorage) });
+let authInstance;
+if (Platform.OS === 'web') {
+  authInstance = getAuth(app);
+} else {
+  try {
+    authInstance = initializeAuth(app, { persistence: getReactNativePersistence(AsyncStorage) });
+  } catch (error: any) {
+    if (error.code === 'auth/already-initialized') {
+      authInstance = getAuth(app);
+    } else {
+      throw error;
+    }
+  }
+}
+export const auth = authInstance;
 
 export const db = getFirestore(app);
 
@@ -1873,7 +4398,14 @@ export const subscribeToAuthChanges = (callback: (user: any) => void) =>
           }
         }
       ],
-      "expo-image"
+      "expo-image",
+      [
+        "expo-notifications",
+        {
+          "icon": "./assets/images/icon.png",
+          "color": "#D4AF37"
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true,
@@ -1904,6 +4436,7 @@ export const subscribeToAuthChanges = (callback: (user: any) => void) =>
     "expo-image": "~56.0.11",
     "expo-linking": "~56.0.15",
     "expo-location": "~56.0.20",
+    "expo-notifications": "~56.0.22",
     "expo-router": "~56.2.14",
     "expo-splash-screen": "~56.0.12",
     "expo-status-bar": "~56.0.4",
@@ -1940,6 +4473,141 @@ export const subscribeToAuthChanges = (callback: (user: any) => void) =>
   },
   "private": true
 }
+</file>
+
+<file path="src/app/(tabs)/index.tsx">
+import React, { useState, useEffect } from 'react';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, ActivityIndicator, ImageBackground } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { Moon, Bell, Sun, Sunrise, Sunset } from 'lucide-react-native';
+import { getCoords, fetchPrayerTimes, getActivePrayer, getNextPrayer, PrayerTimeEntry } from '../../services/prayerService';
+import { scheduleAzanNotifications } from '../../services/notificationService';
+import AnalogClock from '../../components/AnalogClock';
+
+const PRAYER_ICONS: Record<string, any> = {
+  Fajr: Sunrise,
+  Dhuhr: Sun,
+  Asr: Sun,
+  Maghrib: Sunset,
+  Isha: Moon,
+};
+
+export default function Home() {
+  const [currentTime, setCurrentTime] = useState(new Date());
+  const [prayerTimes, setPrayerTimes] = useState<PrayerTimeEntry[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [locationError, setLocationError] = useState<string | null>(null);
+  const [notificationsOn, setNotificationsOn] = useState(false);
+
+  // Time updater
+  useEffect(() => {
+    const timer = setInterval(() => setCurrentTime(new Date()), 1000);
+    return () => clearInterval(timer);
+  }, []);
+
+  // Fetch location and prayer times
+  useEffect(() => {
+    (async () => {
+      try {
+        const { latitude, longitude } = await getCoords();
+        const fetchedTimes = await fetchPrayerTimes(latitude, longitude);
+        setPrayerTimes(fetchedTimes);
+      } catch (err) {
+        console.error('Error fetching prayer times:', err);
+        setLocationError('Failed to load prayer times');
+      } finally {
+        setLoading(false);
+      }
+    })();
+  }, []);
+
+  const formatTime = (date: Date) => date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+  const activePrayerName = getActivePrayer(prayerTimes);
+  const nextPrayer = getNextPrayer(prayerTimes);
+
+  const toggleAzanReminders = async () => {
+    if (notificationsOn) {
+      setNotificationsOn(false);
+      return;
+    }
+    if (prayerTimes.length === 0) return;
+    await scheduleAzanNotifications(prayerTimes);
+    setNotificationsOn(true);
+  };
+
+  return (
+    <ImageBackground source={require('../../../assets/images/homepage.png')} style={styles.backgroundImage}>
+      <SafeAreaView style={styles.container}>
+        <View style={styles.header}>
+          <View style={styles.logoContainer}>
+            <Moon color="#D4AF37" size={32} />
+            <Text style={styles.appName}>Takwa</Text>
+          </View>
+          <TouchableOpacity onPress={toggleAzanReminders}>
+            <Bell color={notificationsOn ? '#4ADE80' : '#D4AF37'} size={24} />
+            <Text style={styles.bellText}>{notificationsOn ? 'Azan On' : 'Azan'}</Text>
+          </TouchableOpacity>
+        </View>
+
+        <View style={styles.clockContainer}>
+          <AnalogClock size={160} />
+          {nextPrayer && (
+            <Text style={styles.nextPrayerText}>
+              {nextPrayer.name} in {Math.max(nextPrayer.minutesLeft, 0)} min
+            </Text>
+          )}
+        </View>
+
+        <ScrollView contentContainerStyle={styles.prayerCardsContainer}>
+          {loading ? (
+            <ActivityIndicator size="large" color="#D4AF37" />
+          ) : locationError ? (
+            <Text style={styles.errorText}>{locationError}</Text>
+          ) : (
+            <View style={styles.grid}>
+              {prayerTimes.map((prayer) => {
+                const Icon = PRAYER_ICONS[prayer.name] || Sun;
+                const isActive = prayer.name === activePrayerName;
+
+                return (
+                  <View key={prayer.name} style={[styles.prayerCard, isActive && styles.activePrayerCard]}>
+                    <Icon color={isActive ? '#D4AF37' : '#FFFFFF'} size={24} />
+                    <Text style={[styles.prayerName, isActive && styles.activeText]}>{prayer.name}</Text>
+                    <Text style={[styles.prayerTime, isActive && styles.activeText]}>{prayer.time}</Text>
+                  </View>
+                );
+              })}
+            </View>
+          )}
+        </ScrollView>
+      </SafeAreaView>
+    </ImageBackground>
+  );
+}
+
+const styles = StyleSheet.create({
+  backgroundImage: { flex: 1, resizeMode: 'cover' },
+  container: { flex: 1, backgroundColor: 'transparent' },
+  header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 20, marginTop: 20 },
+  logoContainer: { flexDirection: 'row', alignItems: 'center' },
+  appName: { color: '#D4AF37', fontSize: 28, fontWeight: 'bold', marginLeft: 10 },
+  bellText: { color: '#D4AF37', fontSize: 12, marginTop: 4, textAlign: 'center' },
+  clockContainer: { alignItems: 'center', marginVertical: 30 },
+  clockText: { color: '#FFFFFF', fontSize: 64, fontWeight: 'bold' },
+  nextPrayerText: { color: '#D4AF37', fontSize: 16, marginTop: 8, fontWeight: '600' },
+  prayerCardsContainer: { paddingHorizontal: 20 },
+  grid: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between' },
+  prayerCard: {
+    width: '31%', backgroundColor: '#1B4332', padding: 12, borderRadius: 12,
+    alignItems: 'center', marginBottom: 12,
+  },
+  activePrayerCard: { backgroundColor: '#1B4332', borderColor: '#D4AF37', borderWidth: 2 },
+  prayerName: { color: '#FFFFFF', fontSize: 14, fontWeight: '600', marginTop: 8 },
+  prayerTime: { color: '#A0A0A0', fontSize: 12, marginTop: 4 },
+  activeText: { color: '#D4AF37' },
+  errorText: { color: '#FF4444', textAlign: 'center', marginTop: 20 },
+});
 </file>
 
 </files>
